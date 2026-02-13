@@ -103,67 +103,104 @@
     .nav__inner {
         height: 60px;
         padding: 0 12px;
+        gap: 8px;
     }
 
     .nav__logo {
         width: 36px;
         height: 36px;
+        flex-shrink: 0;
     }
 
     .nav__name {
-        font-size: 16px;
+        font-size: 14px;
     }
 
     .nav__tagline {
-        font-size: 11px;
+        display: none;
     }
 
     .nav__links {
-        gap: 16px;
+        gap: 8px;
+        flex-wrap: wrap;
     }
 
     .nav__links a {
-        font-size: 13px;
-        padding: 6px 10px;
+        font-size: 12px;
+        padding: 4px 6px;
+        white-space: nowrap;
     }
 
     .nav__cta {
-        padding: 8px 12px;
-        font-size: 12px;
+        padding: 6px 10px;
+        font-size: 11px;
+        flex-shrink: 0;
     }
 }
 
 @media (max-width: 640px) {
     .nav__inner {
         height: 56px;
+        padding: 0 8px;
+        gap: 6px;
     }
 
     .nav__brand {
-        gap: 8px;
+        gap: 6px;
+        flex-shrink: 0;
     }
 
     .nav__logo {
         width: 32px;
         height: 32px;
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .nav__name {
-        font-size: 14px;
+        display: none;
     }
 
     .nav__links {
-        gap: 12px;
+        gap: 4px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        max-width: 200px;
     }
 
     .nav__links a {
-        font-size: 12px;
-        padding: 4px 8px;
+        font-size: 11px;
+        padding: 4px 6px;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .nav__cta {
-        padding: 6px 10px;
-        font-size: 11px;
+        padding: 5px 8px;
+        font-size: 10px;
+        flex-shrink: 0;
+    }
+}
+
+@media (max-width: 500px) {
+    .nav__inner {
+        height: 52px;
+        padding: 0 6px;
+    }
+
+    .nav__logo {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+
+    .nav__links a {
+        font-size: 10px;
+        padding: 3px 4px;
+    }
+
+    .nav__cta {
+        padding: 4px 6px;
+        font-size: 9px;
     }
 }
 .nav__signin {
