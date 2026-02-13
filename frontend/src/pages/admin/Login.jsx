@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar";
-import { loginUnified, saveSession } from "../../api/auth";
+import { loginUnified, saveSession, isLoggedIn, getUserType } from "../../api/auth";
 import "./Login.css";
+import { useEffect } from "react";
 
 export default function Login() {
   const nav = useNavigate();
@@ -10,6 +11,18 @@ export default function Login() {
   const [password, setPassword] = useState("Admin@12345");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isLoggedIn()) {
+      const userType = getUserType();
+      if (userType === "admin") {
+        nav("/admin", { replace: true });
+      } else if (userType === "staff") {
+        nav("/consultant/dashboard", { replace: true });
+      }
+    }
+  }, [nav]);
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -19,11 +32,11 @@ export default function Login() {
       const data = await loginUnified(email, password);
       saveSession(data.token, data.user, data.userType);
       
-      // Route based on user type
+      // Route based on user type (use replace to prevent going back to login)
       if (data.userType === "admin") {
-        nav("/admin");
+        nav("/admin", { replace: true });
       } else if (data.userType === "staff") {
-        nav("/consultant/dashboard");
+        nav("/consultant/dashboard", { replace: true });
       }
     } catch (e2) {
       setErr(e2?.response?.data?.message || "Login failed");

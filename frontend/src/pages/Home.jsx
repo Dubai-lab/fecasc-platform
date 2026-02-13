@@ -174,22 +174,30 @@ export default function Home() {
             </p>
             <div className="certifications__grid">
               <div className="cert-item">
-                <div className="cert-icon">🏆</div>
+                <div className="cert-icon">
+                  <img src="/images/env_certificate.png" alt="EPA Accredited" />
+                </div>
                 <div className="cert-title">EPA Accredited</div>
                 <div className="cert-text">Registered & Accredited by Environmental Protection Agency, Liberia</div>
               </div>
               <div className="cert-item">
-                <div className="cert-icon">✅</div>
+                <div className="cert-icon">
+                  <img src="/images/env_certificate.png" alt="ISO 14001" />
+                </div>
                 <div className="cert-title">ISO 14001</div>
                 <div className="cert-text">Environmental Management Systems Certified</div>
               </div>
               <div className="cert-item">
-                <div className="cert-icon">🛡️</div>
+                <div className="cert-icon">
+                  <img src="/images/env_certificate.png" alt="OHSAS 18001" />
+                </div>
                 <div className="cert-title">OHSAS 18001</div>
                 <div className="cert-text">Occupational Health & Safety Management Systems</div>
               </div>
               <div className="cert-item">
-                <div className="cert-icon">🌍</div>
+                <div className="cert-icon">
+                  <img src="/images/env_certificate.png" alt="World Bank Standards" />
+                </div>
                 <div className="cert-title">World Bank Standards</div>
                 <div className="cert-text">Compliant with Environmental & Social Framework</div>
               </div>
