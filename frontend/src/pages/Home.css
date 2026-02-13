@@ -898,17 +898,17 @@
     }
 
     .cert-item {
-        min-height: 290px;
+        min-height: 240px;
     }
 
     .cert-icon {
-        height: 180px;
+        height: 130px;
         padding-top: 0px;
     }
 
     .cert-icon img {
-        max-width: 246px;
-        max-height: 180px;
+        max-width: 180px;
+        max-height: 130px;
     }
 
     .cert-title {

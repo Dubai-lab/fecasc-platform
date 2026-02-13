@@ -7,8 +7,8 @@ import { useEffect } from "react";
 
 export default function Login() {
   const nav = useNavigate();
-  const [email, setEmail] = useState("admin@fecasc.com");
-  const [password, setPassword] = useState("Admin@12345");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
@@ -55,7 +55,7 @@ export default function Login() {
 
           {err ? <div className="error">{err}</div> : null}
 
-          <form onSubmit={onSubmit} className="form">
+          <form onSubmit={onSubmit} className="form" autoComplete="off">
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <input
@@ -64,6 +64,7 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
                 placeholder="Enter your email"
+                autoComplete="off"
                 required
               />
             </div>
@@ -76,6 +77,7 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
                 placeholder="Enter your password"
+                autoComplete="new-password"
                 required
               />
             </div>

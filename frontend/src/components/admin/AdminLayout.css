@@ -131,3 +131,102 @@
         top: 0;
     }
 }
+
+@media (max-width: 768px) {
+    .admin {
+        grid-template-columns: 1fr;
+    }
+
+    .side {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .side__brand {
+        gap: 8px;
+    }
+
+    .side__logo {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+
+    .side__name {
+        font-size: 14px;
+    }
+
+    .side__muted {
+        font-size: 11px;
+    }
+
+    .side__nav {
+        gap: 6px;
+    }
+
+    .side__link {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    .side__user {
+        gap: 8px;
+    }
+
+    .side__avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .side__userName {
+        font-size: 13px;
+    }
+
+    .top {
+        height: 60px;
+        padding: 0 12px;
+    }
+
+    .top__title {
+        font-size: 16px;
+    }
+
+    .btn {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    .content {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 640px) {
+    .side {
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .side__name {
+        font-size: 12px;
+    }
+
+    .side__link {
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+
+    .top {
+        height: 56px;
+        padding: 0 10px;
+    }
+
+    .top__title {
+        font-size: 14px;
+    }
+
+    .content {
+        padding: 10px;
+    }
+}
