@@ -13,12 +13,14 @@ const router = Router();
 // Public: POST /api/bookings
 router.post("/", async (req, res) => {
   try {
-    const { clientName, clientEmail, clientPhone, message, serviceId } = req.body as {
+    const { clientName, clientEmail, clientPhone, message, serviceId, preferredDate, preferredTime } = req.body as {
       clientName?: string;
       clientEmail?: string;
       clientPhone?: string;
       message?: string;
       serviceId?: string;
+      preferredDate?: string;
+      preferredTime?: string;
     };
 
     if (!clientName || !clientEmail || !serviceId) {
