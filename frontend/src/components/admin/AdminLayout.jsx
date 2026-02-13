@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { getAdmin, logoutAdmin } from "../../api/auth";
 import "./AdminLayout.css";
 
@@ -6,6 +7,7 @@ export default function AdminLayout({ title, children }) {
   const loc = useLocation();
   const nav = useNavigate();
   const admin = getAdmin();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   function onLogout() {
     logoutAdmin();
@@ -16,7 +18,7 @@ export default function AdminLayout({ title, children }) {
 
   return (
     <div className="admin">
-      <aside className="side">
+      <aside className={`side ${sidebarOpen ? "side--open" : ""}`}>
         <div className="side__brand">
           <div className="side__logo">F</div>
           <div>
@@ -26,11 +28,11 @@ export default function AdminLayout({ title, children }) {
         </div>
 
         <nav className="side__nav">
-          <Link className={active("/admin")} to="/admin">Dashboard</Link>
-          <Link className={active("/admin/bookings")} to="/admin/bookings">Bookings</Link>
-          <Link className={active("/admin/services")} to="/admin/services">Services</Link>
-          <Link className={active("/admin/team")} to="/admin/team">Team</Link>
-          <Link className={active("/admin/gallery")} to="/admin/gallery">Gallery</Link>
+          <Link className={active("/admin")} to="/admin" onClick={() => setSidebarOpen(false)}>Dashboard</Link>
+          <Link className={active("/admin/bookings")} to="/admin/bookings" onClick={() => setSidebarOpen(false)}>Bookings</Link>
+          <Link className={active("/admin/services")} to="/admin/services" onClick={() => setSidebarOpen(false)}>Services</Link>
+          <Link className={active("/admin/team")} to="/admin/team" onClick={() => setSidebarOpen(false)}>Team</Link>
+          <Link className={active("/admin/gallery")} to="/admin/gallery" onClick={() => setSidebarOpen(false)}>Gallery</Link>
         </nav>
 
         <div className="side__bottom">
@@ -47,6 +49,11 @@ export default function AdminLayout({ title, children }) {
 
       <section className="main">
         <header className="top">
+          <button className="hamburger" onClick={() => setSidebarOpen(!sidebarOpen)}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
           <h1 className="top__title">{title}</h1>
         </header>
 

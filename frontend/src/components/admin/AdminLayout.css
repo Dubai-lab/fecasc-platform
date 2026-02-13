@@ -2,6 +2,7 @@
     display: grid;
     grid-template-columns: 260px 1fr;
     min-height: 100vh;
+    overflow: hidden;
 }
 
 .side {
@@ -11,6 +12,7 @@
     display: flex;
     flex-direction: column;
     gap: 18px;
+    overflow-y: auto;
 }
 
 .side__brand {
@@ -87,25 +89,54 @@
 
 .main {
     background: #f4f6f5;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    width: 100%;
 }
 
 .top {
     height: 68px;
     display: flex;
     align-items: center;
+    gap: 16px;
     padding: 0 18px;
     border-bottom: 1px solid #e5e7eb;
     background: rgba(244, 246, 245, 0.85);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .top__title {
     font-size: 18px;
+    margin: 0;
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    gap: 5px;
+}
+
+.hamburger span {
+    width: 24px;
+    height: 3px;
+    background: #0b3d2e;
+    border-radius: 2px;
+    transition: all 0.3s ease;
 }
 
 .content {
     padding: 18px;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    flex: 1;
 }
 
 .btn {
@@ -135,11 +166,29 @@
 @media (max-width: 768px) {
     .admin {
         grid-template-columns: 1fr;
+        position: relative;
     }
 
     .side {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 260px;
+        height: 100vh;
+        z-index: 999;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
         padding: 12px;
         gap: 12px;
+    }
+
+    .side--open {
+        transform: translateX(0);
+    }
+
+    .hamburger {
+        display: flex;
     }
 
     .side__brand {
@@ -186,6 +235,7 @@
     .top {
         height: 60px;
         padding: 0 12px;
+        gap: 12px;
     }
 
     .top__title {
@@ -204,6 +254,7 @@
 
 @media (max-width: 640px) {
     .side {
+        width: 240px;
         padding: 10px;
         gap: 10px;
     }
@@ -220,10 +271,20 @@
     .top {
         height: 56px;
         padding: 0 10px;
+        gap: 10px;
     }
 
     .top__title {
         font-size: 14px;
+    }
+
+    .hamburger {
+        padding: 6px;
+    }
+
+    .hamburger span {
+        width: 20px;
+        height: 2.5px;
     }
 
     .content {
