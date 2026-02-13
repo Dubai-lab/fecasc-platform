@@ -11,6 +11,17 @@
     align-items: center;
 }
 
+@media (max-width: 768px) {
+    .hero {
+        padding: 40px 0 20px;
+    }
+
+    .hero__inner {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+}
+
 .hero__badge {
     display: inline-block;
     background: white;
@@ -25,6 +36,18 @@
     margin-top: 14px;
     font-size: 40px;
     line-height: 1.1;
+}
+
+@media (max-width: 768px) {
+    .hero__title {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 640px) {
+    .hero__title {
+        font-size: 26px;
+    }
 }
 
 .hero__text {
@@ -96,6 +119,18 @@
     gap: 12px;
 }
 
+@media (max-width: 768px) {
+    .hero__stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .hero__stats {
+        grid-template-columns: 1fr;
+    }
+}
+
 .stat {
     background: white;
     border: 1px solid var(--border);
@@ -145,6 +180,26 @@
     font-size: 22px;
 }
 
+@media (max-width: 768px) {
+    .section {
+        padding: 28px 0;
+    }
+
+    .section__title {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 640px) {
+    .section {
+        padding: 20px 0;
+    }
+
+    .section__title {
+        font-size: 18px;
+    }
+}
+
 .section__text {
     margin-top: 10px;
     color: var(--muted);
@@ -157,6 +212,18 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 14px;
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .card {
@@ -183,6 +250,18 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 14px;
+}
+
+@media (max-width: 768px) {
+    .contact {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .contact {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Professional Footer */

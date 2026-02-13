@@ -98,6 +98,74 @@
     background: var(--green-900);
 }
 
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .nav__inner {
+        height: 60px;
+        padding: 0 12px;
+    }
+
+    .nav__logo {
+        width: 36px;
+        height: 36px;
+    }
+
+    .nav__name {
+        font-size: 16px;
+    }
+
+    .nav__tagline {
+        font-size: 11px;
+    }
+
+    .nav__links {
+        gap: 16px;
+    }
+
+    .nav__links a {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+
+    .nav__cta {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 640px) {
+    .nav__inner {
+        height: 56px;
+    }
+
+    .nav__brand {
+        gap: 8px;
+    }
+
+    .nav__logo {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .nav__name {
+        font-size: 14px;
+    }
+
+    .nav__links {
+        gap: 12px;
+    }
+
+    .nav__links a {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .nav__cta {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+}
 .nav__signin {
     color: var(--green-700);
     padding: 10px 16px;

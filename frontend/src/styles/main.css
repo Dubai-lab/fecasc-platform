@@ -22,3 +22,16 @@ a {
     margin: 0 auto;
     padding: 0 18px;
 }
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 16px;
+    }
+}
+
+@media (max-width: 640px) {
+    .container {
+        padding: 0 12px;
+    }
+}

@@ -7,11 +7,37 @@
   margin-bottom: 3rem;
 }
 
+@media (max-width: 768px) {
+  .contact__hero {
+    padding: 3rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .contact__hero {
+    padding: 2rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
 .contact__title {
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 1rem;
   letter-spacing: -0.5px;
+}
+
+@media (max-width: 768px) {
+  .contact__title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .contact__title {
+    font-size: 1.5rem;
+  }
 }
 
 .contact__subtitle {
@@ -34,6 +60,13 @@
   align-items: start;
 }
 
+@media (max-width: 768px) {
+  .contact__grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+}
+
 .contact__info-section,
 .contact__map-section {
   display: flex;
@@ -45,6 +78,18 @@
   color: #1a3a34;
   margin-bottom: 0.5rem;
   font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .contact__section-title {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .contact__section-title {
+    font-size: 1.2rem;
+  }
 }
 
 .contact__section-desc {
@@ -70,6 +115,20 @@
   border-radius: 12px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(26, 141, 92, 0.08);
+}
+
+@media (max-width: 768px) {
+  .contact__card {
+    padding: 1.4rem;
+    gap: 1.2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .contact__card {
+    padding: 1rem;
+    gap: 1rem;
+  }
 }
 
 .contact__card:hover {
