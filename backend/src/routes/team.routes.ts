@@ -159,18 +159,18 @@ router.post("/", requireAdmin, upload.single("image"), async (req, res) => {
 router.patch("/:id", requireAdmin, upload.single("image"), async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, title, credentials, bio, order, isActive, email, password, role, department, isPublic } = req.body as {
+    const { name, title, credentials, bio, order, isActive, email, password, role, assignedServices, isPublic } = req.body as {
       name?: string;
       title?: string;
       credentials?: string;
       bio?: string;
-      order?: number;
-      isActive?: boolean;
+      order?: number | string;
+      isActive?: boolean | string;
       email?: string;
       password?: string;
       role?: string;
-      department?: string;
-      isPublic?: boolean;
+      assignedServices?: string[] | string;
+      isPublic?: boolean | string;
     };
 
     // Generate image URL if file was uploaded (Cloudinary returns secure_url in path)
@@ -185,6 +185,28 @@ router.patch("/:id", requireAdmin, upload.single("image"), async (req, res) => {
       passwordHash = await hashPassword(password);
     }
 
+    // Convert isActive to boolean if it's a string
+    let parsedIsActive: boolean | undefined = undefined;
+    if (isActive !== undefined && isActive !== null) {
+      parsedIsActive = typeof isActive === "string" ? isActive === "true" : isActive;
+    }
+
+    // Convert isPublic to boolean if it's a string
+    let parsedIsPublic: boolean | undefined = undefined;
+    if (isPublic !== undefined && isPublic !== null) {
+      parsedIsPublic = typeof isPublic === "string" ? isPublic === "true" : isPublic;
+    }
+
+    // Parse assignedServices
+    let parsedServices: string[] | undefined = undefined;
+    if (assignedServices !== undefined) {
+      try {
+        parsedServices = typeof assignedServices === "string" ? JSON.parse(assignedServices) : assignedServices;
+      } catch (e) {
+        parsedServices = [];
+      }
+    }
+
     const teamMember = await prisma.teamMember.update({
       where: { id: String(id) },
       data: {
@@ -193,13 +215,13 @@ router.patch("/:id", requireAdmin, upload.single("image"), async (req, res) => {
         credentials: credentials ?? undefined,
         bio: bio ?? undefined,
         imageUrl: imageUrl ?? undefined,
-        order: order ? parseInt(order as any) : undefined,
-        isActive: isActive ?? undefined,
+        order: order ? parseInt(String(order)) : undefined,
+        isActive: parsedIsActive ?? undefined,
         email: email ?? undefined,
         passwordHash: passwordHash ?? undefined,
         role: role ?? undefined,
-        department: department ?? undefined,
-        isPublic: isPublic ?? undefined,
+        assignedServices: parsedServices ?? undefined,
+        isPublic: parsedIsPublic ?? undefined,
       },
     });
 
