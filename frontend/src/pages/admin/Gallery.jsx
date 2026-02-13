@@ -274,11 +274,25 @@ export default function Gallery() {
               <div className="loading">Loading images...</div>
             ) : images.length > 0 ? (
               <div className="images-grid">
-                {images.map((image) => (
+                {images.map((image) => {
+                  // Handle both Cloudinary URLs (full URLs) and local paths
+                  let imageUrl = null;
+                  if (image.imageUrl) {
+                    if (image.imageUrl.startsWith("http")) {
+                      // Cloudinary URL - use as is
+                      imageUrl = image.imageUrl;
+                    } else {
+                      // Local path - construct full URL using API base URL
+                      const apiBase = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+                      const baseUrl = apiBase.replace("/api", "");
+                      imageUrl = `${baseUrl}${image.imageUrl}`;
+                    }
+                  }
+                  return (
                   <div key={image.id} className="image-card">
                     <div className="image-wrapper">
                       <img
-                        src={`http://localhost:5000${image.imageUrl}`}
+                        src={imageUrl}
                         alt={image.title || "Gallery image"}
                       />
                     </div>
@@ -307,7 +321,8 @@ export default function Gallery() {
                       </button>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="empty-state">
