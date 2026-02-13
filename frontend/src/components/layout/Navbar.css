@@ -1,0 +1,131 @@
+@import "../../styles/variables.css";
+
+.nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(244, 246, 245, 0.85);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+}
+
+.nav__inner {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.nav__brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav__logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--green-900), var(--green-500));
+    color: white;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.nav__name {
+    font-weight: 800;
+    letter-spacing: 0.4px;
+}
+
+.nav__tagline {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+.nav__links {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.nav__links a {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav__links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--green-700);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav__links a:hover {
+    color: var(--green-700);
+    background: rgba(17, 98, 74, 0.05);
+}
+
+.nav__links a:hover::after {
+    width: 100%;
+}
+
+.nav__cta {
+    background: var(--green-700);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: var(--shadow);
+}
+
+.nav__cta:hover {
+    background: var(--green-900);
+}
+
+.nav__signin {
+    color: var(--green-700);
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: 1px solid var(--green-700);
+}
+
+.nav__signin:hover {
+    background: rgba(17, 98, 74, 0.1);
+    color: var(--green-900);
+    border-color: var(--green-900);
+}
+
+.nav__signin {
+    color: var(--green-700);
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: 1px solid var(--green-700);
+}
+
+.nav__signin:hover {
+    background: rgba(17, 98, 74, 0.1);
+    color: var(--green-900);
+    border-color: var(--green-900);
+}

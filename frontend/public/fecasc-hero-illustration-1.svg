@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650" role="img" aria-label="Environmental consulting illustration">
+  <defs>
+    <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#0b3d2e"/>
+      <stop offset="1" stop-color="#1a8f6a"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#f6fffb"/>
+      <stop offset="1" stop-color="#eef7f3"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#0f172a" flood-opacity=".12"/>
+    </filter>
+  </defs>
+
+  <rect width="900" height="650" rx="36" fill="url(#sky)"/>
+
+  <!-- Soft blobs -->
+  <path d="M720 70c90 0 150 70 150 140s-60 130-150 130-170-55-170-125S630 70 720 70z" fill="#dff3ea"/>
+  <path d="M210 80c90 0 160 55 160 125S310 350 210 350 40 295 40 205 120 80 210 80z" fill="#e8f7f0"/>
+
+  <!-- Card -->
+  <g filter="url(#shadow)">
+    <rect x="95" y="120" width="710" height="420" rx="28" fill="#ffffff" stroke="#e5e7eb"/>
+  </g>
+
+  <!-- Left: Leaf mark -->
+  <g transform="translate(155,210)">
+    <path d="M210 40c-70 10-120 75-120 140 0 52 30 95 78 110 28-35 74-70 132-82 38-8 75-9 110-6-5-78-75-170-200-162z" fill="url(#g1)"/>
+    <path d="M88 205c45-60 122-102 234-118" fill="none" stroke="#0b3d2e" stroke-width="10" stroke-linecap="round" opacity=".25"/>
+    <path d="M130 262c18-52 64-124 158-178" fill="none" stroke="#0b3d2e" stroke-width="10" stroke-linecap="round" opacity=".18"/>
+    <circle cx="320" cy="64" r="10" fill="#1a8f6a" opacity=".55"/>
+    <circle cx="66" cy="146" r="10" fill="#1a8f6a" opacity=".55"/>
+  </g>
+
+  <!-- Right: Analytics + building -->
+  <g transform="translate(520,210)">
+    <!-- mini chart -->
+    <rect x="0" y="0" width="240" height="150" rx="18" fill="#f8fafc" stroke="#e5e7eb"/>
+    <path d="M28 110 L78 85 L122 98 L170 54 L212 70" fill="none" stroke="#1a8f6a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="78" cy="85" r="7" fill="#0b3d2e"/>
+    <circle cx="170" cy="54" r="7" fill="#0b3d2e"/>
+
+    <!-- buildings -->
+    <g transform="translate(0,180)">
+      <rect x="0" y="40" width="70" height="120" rx="10" fill="#0b3d2e" opacity=".9"/>
+      <rect x="85" y="0" width="80" height="160" rx="12" fill="#11624a"/>
+      <rect x="180" y="60" width="60" height="100" rx="10" fill="#1a8f6a"/>
+      <!-- windows -->
+      <g fill="#e8f7f0" opacity=".9">
+        <rect x="18" y="60" width="12" height="12" rx="3"/>
+        <rect x="40" y="60" width="12" height="12" rx="3"/>
+        <rect x="18" y="84" width="12" height="12" rx="3"/>
+        <rect x="40" y="84" width="12" height="12" rx="3"/>
+        <rect x="102" y="22" width="14" height="14" rx="3"/>
+        <rect x="128" y="22" width="14" height="14" rx="3"/>
+        <rect x="102" y="48" width="14" height="14" rx="3"/>
+        <rect x="128" y="48" width="14" height="14" rx="3"/>
+        <rect x="102" y="74" width="14" height="14" rx="3"/>
+        <rect x="128" y="74" width="14" height="14" rx="3"/>
+        <rect x="196" y="80" width="12" height="12" rx="3"/>
+        <rect x="214" y="80" width="12" height="12" rx="3"/>
+      </g>
+      <!-- trees -->
+      <g transform="translate(-10,168)">
+        <circle cx="40" cy="-10" r="20" fill="#1a8f6a" opacity=".9"/>
+        <rect x="34" y="6" width="12" height="26" rx="6" fill="#0b3d2e" opacity=".55"/>
+      </g>
+      <g transform="translate(170,168)">
+        <circle cx="40" cy="-10" r="20" fill="#1a8f6a" opacity=".9"/>
+        <rect x="34" y="6" width="12" height="26" rx="6" fill="#0b3d2e" opacity=".55"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Footer waves -->
+  <path d="M0 560c120-60 240-40 360 0s240 60 360 0 240-60 360 0v120H0z" fill="#dff3ea"/>
+  <path d="M0 590c120-40 240-30 360 0s240 40 360 0 240-40 360 0v90H0z" fill="#ccefe1"/>
+
+  <!-- Small icons -->
+  <g transform="translate(125,490)">
+    <rect x="0" y="0" width="160" height="70" rx="18" fill="#f8fafc" stroke="#e5e7eb"/>
+    <path d="M28 42c20-22 40-22 60 0" fill="none" stroke="#1a8f6a" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="120" cy="35" r="14" fill="#0b3d2e" opacity=".85"/>
+    <path d="M116 35l6 6" stroke="#e8f7f0" stroke-width="4" stroke-linecap="round"/>
+    <path d="M120 27v16" stroke="#e8f7f0" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

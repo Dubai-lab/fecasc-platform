@@ -1,0 +1,93 @@
+import { Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
+
+import Home from "../pages/Home";
+import About from "../pages/About";
+import Services from "../pages/Services";
+import Contact from "../pages/Contact";
+
+// Admin pages
+import Login from "../pages/admin/Login";
+import Dashboard from "../pages/admin/Dashboard";
+import Bookings from "../pages/admin/Bookings";
+import AdminServices from "../pages/admin/Services";
+import Team from "../pages/admin/Team";
+import Gallery from "../pages/admin/Gallery";
+import BookServices from "../pages/BookServices";
+
+// Consultant pages
+import ConsultantDashboard from "../pages/consultant/ConsultantDashboard";
+
+
+export default function AppRoutes() {
+  return (
+    <Routes>
+      {/* Public */}
+      <Route path="/" element={<Home />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/services" element={<Services />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/book" element={<BookServices />} />
+
+      {/* Unified Login */}
+      <Route path="/admin/login" element={<Login />} />
+
+      {/* Admin Routes */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/bookings"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <Bookings />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/services"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminServices />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/team"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <Team />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/gallery"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <Gallery />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Consultant/Staff Routes */}
+      <Route
+        path="/consultant/dashboard"
+        element={
+          <ProtectedRoute requiredRole="staff">
+            <ConsultantDashboard />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+    
+  );
+}

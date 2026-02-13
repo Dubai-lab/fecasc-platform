@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650" role="img" aria-label="Sustainability illustration">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#eef7f3"/>
+    </linearGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#11624a"/>
+      <stop offset="1" stop-color="#1a8f6a"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="650" rx="36" fill="url(#bg)"/>
+  <circle cx="720" cy="140" r="90" fill="#dff3ea"/>
+  <circle cx="210" cy="520" r="130" fill="#e8f7f0"/>
+
+  <!-- Globe -->
+  <g transform="translate(250,150)">
+    <circle cx="200" cy="200" r="170" fill="#0b3d2e" opacity=".08"/>
+    <circle cx="200" cy="200" r="160" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M85 205c70-80 160-120 250-110 70 8 120 46 155 90-60 90-160 140-260 130-70-7-120-44-145-110z" fill="#dff3ea"/>
+    <path d="M122 150c18 60 90 120 178 135 58 10 110 2 152-18-18 58-72 104-150 114-110 14-220-54-250-155 16-35 39-60 70-76z" fill="#ccefe1"/>
+    <path d="M55 200h290" stroke="#11624a" stroke-width="8" opacity=".25" stroke-linecap="round"/>
+    <path d="M200 45v310" stroke="#11624a" stroke-width="8" opacity=".18" stroke-linecap="round"/>
+    <circle cx="130" cy="210" r="10" fill="#1a8f6a" opacity=".6"/>
+    <circle cx="260" cy="160" r="10" fill="#1a8f6a" opacity=".6"/>
+  </g>
+
+  <!-- Leaf + document -->
+  <g transform="translate(575,330)">
+    <rect x="0" y="0" width="250" height="220" rx="22" fill="#ffffff" stroke="#e5e7eb"/>
+    <path d="M52 155c-18-70 20-138 108-148 62-7 112 32 130 90-56 4-130 28-170 58-26 20-44 40-56 62-6-18-10-40-12-62z" fill="url(#leaf)"/>
+    <path d="M48 155c46-58 122-96 214-110" fill="none" stroke="#0b3d2e" stroke-width="9" opacity=".22" stroke-linecap="round"/>
+    <rect x="28" y="28" width="92" height="12" rx="6" fill="#e8f7f0"/>
+    <rect x="28" y="52" width="150" height="12" rx="6" fill="#e8f7f0"/>
+    <rect x="28" y="76" width="120" height="12" rx="6" fill="#e8f7f0"/>
+  </g>
+</svg>

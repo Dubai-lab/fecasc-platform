@@ -1,0 +1,247 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Climate contrast illustration">
+  <defs>
+    <!-- Clip everything inside the main circle -->
+    <clipPath id="clipCircle">
+      <circle cx="512" cy="512" r="420"/>
+    </clipPath>
+
+    <!-- Soft background -->
+    <linearGradient id="skyLeft" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cfefff"/>
+      <stop offset="100%" stop-color="#eaf8ff"/>
+    </linearGradient>
+    <linearGradient id="skyRight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd2c8"/>
+      <stop offset="100%" stop-color="#ffe7df"/>
+    </linearGradient>
+
+    <linearGradient id="greenHill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#59b85e"/>
+      <stop offset="100%" stop-color="#2f7f45"/>
+    </linearGradient>
+    <linearGradient id="river" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#86d6df"/>
+      <stop offset="100%" stop-color="#4fb6c7"/>
+    </linearGradient>
+
+    <linearGradient id="dryGround" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c9836e"/>
+      <stop offset="100%" stop-color="#9b5b49"/>
+    </linearGradient>
+
+    <linearGradient id="smoke" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2f2a2a" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#2f2a2a" stop-opacity="0.55"/>
+    </linearGradient>
+
+    <linearGradient id="ice" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f4fbff"/>
+      <stop offset="100%" stop-color="#cfefff"/>
+    </linearGradient>
+
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Main badge circle -->
+  <circle cx="512" cy="512" r="420" fill="#ffffff" filter="url(#shadow)"/>
+
+  <!-- Content inside the circle -->
+  <g clip-path="url(#clipCircle)">
+    <!-- Split sky -->
+    <rect x="92" y="92" width="420" height="420" fill="url(#skyLeft)"/>
+    <rect x="512" y="92" width="420" height="420" fill="url(#skyRight)"/>
+
+    <!-- Left: green hills -->
+    <path d="M92 430 C210 320, 330 330, 440 420 C500 470, 560 470, 610 430 L610 650 L92 650 Z"
+          fill="url(#greenHill)"/>
+    <path d="M92 520 C220 420, 350 440, 470 510 C520 540, 560 540, 610 510 L610 760 L92 760 Z"
+          fill="#61c46a" opacity="0.85"/>
+
+    <!-- Right: dry hills -->
+    <path d="M512 450 C640 340, 780 350, 932 450 L932 720 L512 720 Z" fill="#d07f68"/>
+    <path d="M512 520 C660 430, 790 450, 932 540 L932 800 L512 800 Z" fill="url(#dryGround)"/>
+
+    <!-- Vertical split line -->
+    <rect x="510" y="92" width="4" height="840" fill="#ffffff" opacity="0.85"/>
+
+    <!-- River (left) -->
+    <path d="M230 780
+             C220 710, 260 670, 310 640
+             C360 610, 380 570, 360 530
+             C330 470, 360 440, 420 420
+             C470 404, 500 380, 520 350
+             L560 350
+             C540 400, 510 430, 455 450
+             C405 468, 385 492, 405 535
+             C435 600, 400 650, 345 680
+             C295 707, 270 735, 275 780
+             Z"
+          fill="url(#river)" opacity="0.95"/>
+
+    <!-- River (right melt water pool) -->
+    <path d="M520 760
+             C590 730, 660 735, 720 770
+             C780 805, 850 810, 932 780
+             L932 932 L520 932 Z"
+          fill="#7bc8d5" opacity="0.9"/>
+
+    <!-- Melt drips (outside-ish look but still inside circle) -->
+    <path d="M860 900 C880 930, 880 960, 860 980 C840 1000, 820 975, 835 945 C845 925, 845 912, 860 900 Z"
+          fill="#7bc8d5" opacity="0.9"/>
+    <path d="M900 890 C925 920, 930 960, 905 990 C885 1015, 865 990, 875 955 C882 930, 885 905, 900 890 Z"
+          fill="#7bc8d5" opacity="0.9"/>
+
+    <!-- Solar panels -->
+    <g transform="translate(340 560) skewX(-10)">
+      <rect x="0" y="0" width="210" height="80" rx="10" fill="#2f5f6f" opacity="0.25"/>
+      <rect x="10" y="-10" width="210" height="80" rx="10" fill="#1e5a72"/>
+      <!-- grid -->
+      <g stroke="#bfe7f3" stroke-width="2" opacity="0.85">
+        <line x1="35" y1="-10" x2="35" y2="70"/>
+        <line x1="60" y1="-10" x2="60" y2="70"/>
+        <line x1="85" y1="-10" x2="85" y2="70"/>
+        <line x1="110" y1="-10" x2="110" y2="70"/>
+        <line x1="135" y1="-10" x2="135" y2="70"/>
+        <line x1="160" y1="-10" x2="160" y2="70"/>
+        <line x1="185" y1="-10" x2="185" y2="70"/>
+        <line x1="10" y1="10" x2="220" y2="10"/>
+        <line x1="10" y1="30" x2="220" y2="30"/>
+        <line x1="10" y1="50" x2="220" y2="50"/>
+      </g>
+      <rect x="25" y="70" width="6" height="22" fill="#36525c"/>
+      <rect x="180" y="70" width="6" height="22" fill="#36525c"/>
+    </g>
+
+    <!-- Wind turbines -->
+    <g transform="translate(170 510)">
+      <!-- pole -->
+      <rect x="40" y="-220" width="16" height="300" rx="8" fill="#eaf6ef"/>
+      <circle cx="48" cy="-220" r="18" fill="#2f7f45"/>
+      <!-- blades -->
+      <g fill="#cfe8c8" opacity="0.95">
+        <path d="M48 -220 L150 -250 Q160 -253 155 -242 L60 -206 Z"/>
+        <path d="M48 -220 L10 -120 Q6 -110 18 -112 L68 -205 Z"/>
+        <path d="M48 -220 L-70 -260 Q-80 -265 -72 -250 L38 -210 Z"/>
+      </g>
+    </g>
+
+    <g transform="translate(260 530) scale(0.75)">
+      <rect x="40" y="-220" width="16" height="300" rx="8" fill="#eaf6ef"/>
+      <circle cx="48" cy="-220" r="18" fill="#2f7f45"/>
+      <g fill="#cfe8c8" opacity="0.95">
+        <path d="M48 -220 L150 -250 Q160 -253 155 -242 L60 -206 Z"/>
+        <path d="M48 -220 L10 -120 Q6 -110 18 -112 L68 -205 Z"/>
+        <path d="M48 -220 L-70 -260 Q-80 -265 -72 -250 L38 -210 Z"/>
+      </g>
+    </g>
+
+    <!-- Trees (left) -->
+    <g fill="#8fd199" opacity="0.95">
+      <g transform="translate(165 675)">
+        <rect x="18" y="40" width="10" height="42" rx="4" fill="#2f7f45"/>
+        <ellipse cx="24" cy="30" rx="26" ry="32"/>
+      </g>
+      <g transform="translate(210 720) scale(0.9)">
+        <rect x="18" y="40" width="10" height="42" rx="4" fill="#2f7f45"/>
+        <ellipse cx="24" cy="30" rx="26" ry="32"/>
+      </g>
+      <g transform="translate(260 690) scale(1.05)">
+        <rect x="18" y="40" width="10" height="42" rx="4" fill="#2f7f45"/>
+        <ellipse cx="24" cy="30" rx="26" ry="32"/>
+      </g>
+    </g>
+
+    <!-- Right: factory -->
+    <g transform="translate(760 520)">
+      <rect x="80" y="100" width="220" height="150" rx="16" fill="#8a5f55" opacity="0.95"/>
+      <rect x="80" y="80" width="220" height="40" rx="10" fill="#6f4a43" opacity="0.95"/>
+      <!-- chimneys -->
+      <g>
+        <rect x="150" y="-10" width="50" height="120" rx="10" fill="#c06a55"/>
+        <rect x="230" y="-30" width="50" height="140" rx="10" fill="#c06a55"/>
+        <!-- stripes -->
+        <g fill="#f4d5c7" opacity="0.85">
+          <rect x="150" y="10" width="50" height="14"/>
+          <rect x="150" y="40" width="50" height="14"/>
+          <rect x="230" y="0" width="50" height="14"/>
+          <rect x="230" y="30" width="50" height="14"/>
+          <rect x="230" y="60" width="50" height="14"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- Smoke cloud -->
+    <path d="M790 320
+             C820 280, 900 285, 910 340
+             C960 350, 975 415, 930 450
+             C950 500, 910 545, 860 535
+             C835 580, 760 580, 750 525
+             C700 520, 675 460, 715 430
+             C690 380, 725 335, 790 320 Z"
+          fill="url(#smoke)"/>
+
+    <!-- Burned trees -->
+    <g stroke="#1b1b1b" stroke-width="10" stroke-linecap="round">
+      <path d="M640 710 L640 620"/>
+      <path d="M640 650 L615 625"/>
+      <path d="M640 650 L665 630"/>
+
+      <path d="M700 720 L700 640"/>
+      <path d="M700 670 L680 650"/>
+      <path d="M700 670 L720 650"/>
+
+      <path d="M760 705 L760 640"/>
+      <path d="M760 665 L740 648"/>
+      <path d="M760 665 L780 645"/>
+    </g>
+
+    <!-- Fire -->
+    <g transform="translate(675 640)">
+      <path d="M30 120
+               C0 90, 10 60, 30 40
+               C45 20, 35 0, 55 0
+               C85 0, 70 35, 90 55
+               C110 75, 105 105, 80 125
+               C60 140, 45 145, 30 120 Z"
+            fill="#ffb400"/>
+      <path d="M45 118
+               C25 96, 30 74, 45 60
+               C58 48, 55 32, 68 32
+               C86 32, 78 54, 92 68
+               C105 82, 98 103, 82 116
+               C68 126, 58 130, 45 118 Z"
+            fill="#ff6b3d"/>
+    </g>
+
+    <!-- Cracked ground lines -->
+    <g stroke="#6a3f35" stroke-width="6" stroke-linecap="round" opacity="0.8">
+      <path d="M560 820 L640 790 L700 830 L770 800"/>
+      <path d="M610 880 L680 860 L740 900 L820 870"/>
+      <path d="M560 900 L610 850 L640 920"/>
+      <path d="M720 860 L710 800 L760 845"/>
+      <path d="M840 900 L820 840 L890 860"/>
+    </g>
+
+    <!-- Ice chunk -->
+    <g transform="translate(690 820)">
+      <path d="M60 0
+               C95 0, 125 18, 135 45
+               C150 85, 120 125, 75 135
+               C35 145, 0 125, 0 85
+               C0 35, 25 0, 60 0 Z"
+            fill="url(#ice)" stroke="#b8e3f3" stroke-width="8"/>
+      <path d="M22 85 C45 70, 70 70, 100 85" fill="none" stroke="#9cd3ea" stroke-width="6" opacity="0.8"/>
+    </g>
+
+    <!-- Floating mini ice -->
+    <g fill="#e8f7ff" stroke="#b8e3f3" stroke-width="6">
+      <path d="M585 840 C605 828, 630 830, 640 846 C654 868, 632 890, 608 886 C585 882, 570 855, 585 840 Z"/>
+      <path d="M625 905 C640 895, 660 898, 668 912 C678 930, 660 950, 642 946 C625 942, 615 920, 625 905 Z"/>
+    </g>
+  </g>
+
+  <!-- Circle outline -->
+  <circle cx="512" cy="512" r="420" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.9"/>
+</svg>

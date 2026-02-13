@@ -1,0 +1,108 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  title       String   @unique
+  description String?
+  department  String? // "Environmental", "HSE", "Engineering", etc
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  bookings Booking[]
+}
+
+model TeamMember {
+  id          String  @id @default(uuid())
+  name        String
+  title       String
+  credentials String?
+  bio         String?
+  imageUrl    String?
+  order       Int     @default(0)
+  isActive    Boolean @default(true)
+
+  // Staff/Consultant fields
+  email        String? @unique
+  passwordHash String?
+  role         String  @default("PUBLIC") // "PUBLIC", "STAFF"
+  isPublic     Boolean @default(true) // Show on website "Our Team" page
+
+  // Services assigned to this staff member
+  assignedServices String[] // Array of service IDs this staff manages
+
+  // Relations - assigned bookings
+  assignedBookings Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Booking {
+  id          String        @id @default(uuid())
+  clientName  String
+  clientEmail String
+  clientPhone String?
+  message     String?
+  status      BookingStatus @default(NEW)
+  bookingRef  String        @unique // Unique reference for client lookup
+
+  // Consultant assignment
+  assignedConsultantId String?
+  assignedConsultant   TeamMember? @relation(fields: [assignedConsultantId], references: [id])
+
+  // Service reference
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id])
+
+  // Tracking
+  consultantNotifiedAt   DateTime? // When consultant was emailed
+  consultantRepliedAt    DateTime? // When consultant first reached out
+  clientConfirmEmailSent DateTime? // When confirmation email was sent to client
+  lastContactMethod      String? // How we last contacted client: "WHATSAPP", "EMAIL", "PHONE"
+
+  // Internal notes for staff/admin
+  internalNotes String? // Activity log: "Consultant reached out on 13-Feb-2026", "Quote sent: $5000", etc.
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GalleryImage {
+  id          String   @id @default(uuid())
+  category    String // "projects", "worksite", "services"
+  title       String?
+  description String?
+  imageUrl    String // Path to the image file
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum BookingStatus {
+  NEW // Just received, awaiting admin assignment
+  ASSIGNED // Consultant assigned and notified
+  AWAITING_CLIENT // Consultant has reached out, waiting for client response
+  COMPLETED // Project completed or closed
+}

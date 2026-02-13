@@ -1,0 +1,133 @@
+.admin {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+}
+
+.side {
+    background: #0b3d2e;
+    color: white;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.side__brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.side__logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1a8f6a, #0b3d2e);
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+}
+
+.side__name {
+    font-weight: 900;
+}
+
+.side__muted {
+    opacity: 0.75;
+    font-size: 12px;
+}
+
+.small {
+    font-size: 11px;
+}
+
+.side__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.side__link {
+    padding: 10px 12px;
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.side__link:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.side__link--active {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.side__bottom {
+    margin-top: auto;
+    display: grid;
+    gap: 12px;
+}
+
+.side__user {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.side__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+}
+
+.main {
+    background: #f4f6f5;
+}
+
+.top {
+    height: 68px;
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    border-bottom: 1px solid #e5e7eb;
+    background: rgba(244, 246, 245, 0.85);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.top__title {
+    font-size: 18px;
+}
+
+.content {
+    padding: 18px;
+}
+
+.btn {
+    border: none;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.btn--danger {
+    background: #b42318;
+    color: white;
+}
+
+@media (max-width: 900px) {
+    .admin {
+        grid-template-columns: 1fr;
+    }
+
+    .side {
+        position: sticky;
+        top: 0;
+    }
+}
