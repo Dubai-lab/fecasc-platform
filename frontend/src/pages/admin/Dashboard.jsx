@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import http from "../../api/http";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import "./Dashboard.css";
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -115,88 +116,61 @@ export default function Dashboard() {
 
   return (
     <AdminLayout title="Dashboard">
-      <div style={{ display: "grid", gap: 16 }}>
+      <div className="dashboard-container">
         {/* Welcome Section */}
-        <div style={{ background: "linear-gradient(135deg, #0b3d2e, #11624a)", borderRadius: 14, padding: 24, color: "white" }}>
-          <h2 style={{ marginBottom: 8, fontSize: 24 }}>Welcome back! 👋</h2>
-          <p style={{ opacity: 0.9, lineHeight: 1.6 }}>
+        <div className="welcome-section">
+          <h2>Welcome back! 👋</h2>
+          <p>
             Manage bookings, services, and keep FECASC running smoothly.
           </p>
         </div>
 
         {/* Statistics Cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 }}>
-          <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 14, padding: 20 }}>
-            <div style={{ fontSize: 24, marginBottom: 8 }}>📋</div>
-            <div style={{ color: "#64748b", fontSize: 13, marginBottom: 8 }}>Total Bookings</div>
-            <div style={{ fontSize: 32, fontWeight: 900, color: "#1a8f6a" }}>
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-card__icon">📋</div>
+            <div className="stat-card__label">Total Bookings</div>
+            <div className="stat-card__value" style={{ color: "#1a8f6a" }}>
               {loading ? "—" : stats.bookings}
             </div>
           </div>
 
-          <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 14, padding: 20 }}>
-            <div style={{ fontSize: 24, marginBottom: 8 }}>⚙️</div>
-            <div style={{ color: "#64748b", fontSize: 13, marginBottom: 8 }}>Total Services</div>
-            <div style={{ fontSize: 32, fontWeight: 900, color: "#11624a" }}>
+          <div className="stat-card">
+            <div className="stat-card__icon">⚙️</div>
+            <div className="stat-card__label">Total Services</div>
+            <div className="stat-card__value" style={{ color: "#11624a" }}>
               {loading ? "—" : stats.services}
             </div>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 14, padding: 20 }}>
-          <h3 style={{ marginBottom: 16, fontWeight: 800 }}>Quick Actions</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-            <a href="/admin/bookings" style={{ 
-              background: "#11624a", 
-              color: "white", 
-              padding: "12px 16px", 
-              borderRadius: 12, 
-              textAlign: "center", 
-              textDecoration: "none",
-              fontWeight: 700,
-              transition: "background 0.3s",
-            }} onMouseOver={(e) => e.target.style.background = "#0b3d2e"} onMouseOut={(e) => e.target.style.background = "#11624a"}>
+        <div className="actions-section">
+          <h3>Quick Actions</h3>
+          <div className="actions-grid">
+            <a href="/admin/bookings" className="action-btn" style={{ background: "#11624a" }} onMouseOver={(e) => e.target.style.background = "#0b3d2e"} onMouseOut={(e) => e.target.style.background = "#11624a"}>
               View All Bookings
             </a>
-            <a href="/admin/services" style={{ 
-              background: "#1a8f6a", 
-              color: "white", 
-              padding: "12px 16px", 
-              borderRadius: 12, 
-              textAlign: "center", 
-              textDecoration: "none",
-              fontWeight: 700,
-              transition: "background 0.3s",
-            }} onMouseOver={(e) => e.target.style.background = "#11624a"} onMouseOut={(e) => e.target.style.background = "#1a8f6a"}>
+            <a href="/admin/services" className="action-btn" style={{ background: "#1a8f6a" }} onMouseOver={(e) => e.target.style.background = "#11624a"} onMouseOut={(e) => e.target.style.background = "#1a8f6a"}>
               Manage Services
             </a>
-            <a href="/admin/gallery" style={{ 
-              background: "#1a8f6a", 
-              color: "white", 
-              padding: "12px 16px", 
-              borderRadius: 12, 
-              textAlign: "center", 
-              textDecoration: "none",
-              fontWeight: 700,
-              transition: "background 0.3s",
-            }} onMouseOver={(e) => e.target.style.background = "#11624a"} onMouseOut={(e) => e.target.style.background = "#1a8f6a"}>
+            <a href="/admin/gallery" className="action-btn" style={{ background: "#1a8f6a" }} onMouseOver={(e) => e.target.style.background = "#11624a"} onMouseOut={(e) => e.target.style.background = "#1a8f6a"}>
               Manage Gallery
             </a>
           </div>
         </div>
 
         {/* Charts Section */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div className="charts-grid">
           {/* Bookings Chart */}
-          <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 14, padding: 20 }}>
-            <h3 style={{ marginBottom: 16, fontWeight: 800, fontSize: 16 }}>Bookings This Week</h3>
+          <div className="chart-card">
+            <h3>Bookings This Week</h3>
             {loading ? (
-              <div style={{ height: 300, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>
-                Loading chart...
+              <div className="chart-container">
+                <div className="chart-loading">Loading chart...</div>
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="name" stroke="#64748b" style={{ fontSize: 12 }} />
@@ -212,14 +186,14 @@ export default function Dashboard() {
           </div>
 
           {/* Services Distribution Chart */}
-          <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 14, padding: 20 }}>
-            <h3 style={{ marginBottom: 16, fontWeight: 800, fontSize: 16 }}>Top Services</h3>
+          <div className="chart-card">
+            <h3>Top Services</h3>
             {loading ? (
-              <div style={{ height: 300, display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>
-                Loading chart...
+              <div className="chart-container">
+                <div className="chart-loading">Loading chart...</div>
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
                     data={serviceData}
@@ -227,7 +201,7 @@ export default function Dashboard() {
                     cy="50%"
                     labelLine={false}
                     label={({ name, value }) => `${name} (${value})`}
-                    outerRadius={80}
+                    outerRadius={70}
                     fill="#1a8f6a"
                     dataKey="value"
                   >
@@ -248,23 +222,23 @@ export default function Dashboard() {
         </div>
 
         {/* System Information */}
-        <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 14, padding: 20 }}>
-          <h3 style={{ marginBottom: 16, fontWeight: 800, fontSize: 16 }}>📊 System Performance</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-            <div style={{ padding: 16, background: "#f0fdf9", borderRadius: 12, borderLeft: "4px solid #1a8f6a" }}>
-              <div style={{ color: "#64748b", fontSize: 13, marginBottom: 8 }}>Real-time Sync</div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: "#1a8f6a" }}>✓ Active</div>
-              <div style={{ color: "#94a3b8", fontSize: 12, marginTop: 8 }}>All data synced continuously</div>
+        <div className="system-info">
+          <h3>📊 System Performance</h3>
+          <div className="system-info-grid">
+            <div className="system-info-card">
+              <div className="system-info-card__label">Real-time Sync</div>
+              <div className="system-info-card__status">✓ Active</div>
+              <div className="system-info-card__detail">All data synced continuously</div>
             </div>
-            <div style={{ padding: 16, background: "#f0fdf9", borderRadius: 12, borderLeft: "4px solid #16a34a" }}>
-              <div style={{ color: "#64748b", fontSize: 13, marginBottom: 8 }}>Data Backups</div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: "#16a34a" }}>✓ Daily</div>
-              <div style={{ color: "#94a3b8", fontSize: 12, marginTop: 8 }}>Last backup: Today</div>
+            <div className="system-info-card" style={{ borderLeftColor: "#16a34a" }}>
+              <div className="system-info-card__label">Data Backups</div>
+              <div className="system-info-card__status" style={{ color: "#16a34a" }}>✓ Daily</div>
+              <div className="system-info-card__detail">Last backup: Today</div>
             </div>
-            <div style={{ padding: 16, background: "#f0fdf9", borderRadius: 12, borderLeft: "4px solid #15803d" }}>
-              <div style={{ color: "#64748b", fontSize: 13, marginBottom: 8 }}>System Status</div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: "#15803d" }}>✓ Healthy</div>
-              <div style={{ color: "#94a3b8", fontSize: 12, marginTop: 8 }}>All systems operational</div>
+            <div className="system-info-card" style={{ borderLeftColor: "#15803d" }}>
+              <div className="system-info-card__label">System Status</div>
+              <div className="system-info-card__status" style={{ color: "#15803d" }}>✓ Healthy</div>
+              <div className="system-info-card__detail">All systems operational</div>
             </div>
           </div>
         </div>
