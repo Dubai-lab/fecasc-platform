@@ -1,23 +1,19 @@
 import multer from "multer";
-import path from "path";
-import fs from "fs";
-import { fileURLToPath } from "url";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-// Team uploads directory
-const teamUploadDir = path.join(__dirname, "../../public/uploads/team");
-
-// Ensure directories exist
-if (!fs.existsSync(teamUploadDir)) {
-  fs.mkdirSync(teamUploadDir, { recursive: true });
-}
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // File filter for image files
 const fileFilter = (_req: any, file: any, cb: any) => {
   // Only allow image files
   const allowedTypes = /jpeg|jpg|png|gif|webp/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+  const extname = allowedTypes.test(file.originalname.toLowerCase().split(".").pop());
   const mimetype = allowedTypes.test(file.mimetype);
 
   if (extname && mimetype) {
@@ -27,36 +23,22 @@ const fileFilter = (_req: any, file: any, cb: any) => {
   }
 };
 
-// Team upload storage
-const teamStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, teamUploadDir);
-  },
-  filename: (_req, file, cb) => {
-    // Generate unique filename with timestamp
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
+// Team upload storage on Cloudinary
+const teamStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "fecasc/team",
+    resource_type: "auto",
+  } as any,
 });
 
-// Gallery upload storage with dynamic category-based directory
-const galleryStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const category = req.body.category;
-    const uploadDir = path.join(__dirname, `../../public/uploads/gallery/${category}`);
-    
-    // Ensure directory exists
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    
-    cb(null, uploadDir);
-  },
-  filename: (_req, file, cb) => {
-    // Generate unique filename with timestamp
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
+// Gallery upload storage on Cloudinary
+const galleryStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "fecasc/gallery",
+    resource_type: "auto",
+  } as any,
 });
 
 export const upload = multer({
