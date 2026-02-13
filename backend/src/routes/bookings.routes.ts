@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
-import { transporter } from "../lib/mailer.js";
+import { sendEmail } from "../lib/mailer.js";
+import {
+  getClientConfirmationEmailTemplate,
+  getAdminNotificationTemplate,
+  getConsultantNotificationTemplate,
+} from "../lib/templates/bookingEmails.js";
 import { requireAdmin, requireStaff, AuthedRequest } from "../middleware/auth.middleware.js";
 
 const router = Router();
@@ -61,31 +66,30 @@ router.post("/", async (req, res) => {
     // Email setup
     const adminEmail = process.env.COMPANY_NOTIFY_EMAIL;
     const companyPhone = process.env.COMPANY_PHONE || "+1 (555) 000-0000";
-    const canEmail = adminEmail && process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS;
+    const resendFromEmail = process.env.RESEND_FROM_EMAIL || "noreply@fecasc.com";
+    const canEmail = adminEmail && process.env.RESEND_API_KEY;
 
     if (canEmail) {
       try {
         // 1. IMMEDIATE confirmation email to CLIENT
-        const clientConfirmEmail =
-          `Dear ${clientName},\n\n` +
-          `Thank you for contacting FECASC. We have received your service request for "${booking.service.title}" and appreciate your interest.\n\n` +
-          `Booking Reference: ${booking.bookingRef}\n\n` +
-          `Our team will review your inquiry and reach out to you within 48 hours at:\n` +
-          `📧 ${clientEmail}\n` +
-          `📱 ${clientPhone || "as provided"}\n\n` +
-          `If you have any urgent questions, please contact us:\n` +
-          `📞 ${companyPhone}\n` +
-          `🌐 www.fecasc.com\n\n` +
-          `We look forward to working with you.\n\n` +
-          `Best regards,\n` +
-          `FECASC Team\n` +
-          `Green Thinking, Brighter Future`;
+        const { html: clientHtml, text: clientText } = getClientConfirmationEmailTemplate(
+          clientName,
+          booking.bookingRef,
+          booking.service.title,
+          preferredDate || null,
+          preferredTime || null,
+          clientEmail,
+          clientPhone || null,
+          adminEmail,
+          companyPhone
+        );
 
-        await transporter.sendMail({
-          from: process.env.SMTP_FROM || process.env.SMTP_USER,
+        await sendEmail({
+          from: resendFromEmail,
           to: clientEmail,
           subject: `We Received Your Request - Ref: ${booking.bookingRef}`,
-          text: clientConfirmEmail,
+          html: clientHtml,
+          text: clientText,
         });
 
         // Update booking to mark confirmation email as sent
@@ -95,42 +99,41 @@ router.post("/", async (req, res) => {
         });
 
         // 2. Admin notification
-        const adminSubject = `New Booking: ${booking.service.title} (${booking.bookingRef})${assignedConsultant ? ` - Assigned to ${assignedConsultant.name}` : ""}`;
-        const adminText =
-          `New booking received\n\n` +
-          `Booking Ref: ${booking.bookingRef}\n` +
-          `Service: ${booking.service.title}\n` +
-          `Client Name: ${booking.clientName}\n` +
-          `Email: ${booking.clientEmail}\n` +
-          `Phone: ${booking.clientPhone || "-"}\n` +
-          `Message: ${booking.message || "-"}\n` +
-          `${assignedConsultant ? `Assigned to: ${assignedConsultant.name} (${assignedConsultant.title})\n` : "Status: Awaiting assignment\n"}` +
-          `Date: ${booking.createdAt}\n`;
+        const { html: adminHtml, text: adminText } = getAdminNotificationTemplate(
+          booking.bookingRef,
+          booking.service.title,
+          booking.clientName,
+          booking.clientEmail,
+          booking.clientPhone || null,
+          booking.message || null,
+          assignedConsultant ? { name: assignedConsultant.name, title: assignedConsultant.title } : null,
+          booking.createdAt
+        );
 
-        await transporter.sendMail({
-          from: process.env.SMTP_FROM || process.env.SMTP_USER,
+        await sendEmail({
+          from: resendFromEmail,
           to: adminEmail,
-          subject: adminSubject,
+          subject: `New Booking: ${booking.service.title} (${booking.bookingRef})${assignedConsultant ? ` - Assigned to ${assignedConsultant.name}` : ""}`,
+          html: adminHtml,
           text: adminText,
         });
 
         // 3. Consultant notification (if assigned)
         if (assignedConsultant?.email) {
-          const consultantText =
-            `You have been assigned a new client inquiry\n\n` +
-            `Booking Ref: ${booking.bookingRef}\n` +
-            `Service: ${booking.service.title}\n` +
-            `Client Name: ${booking.clientName}\n` +
-            `Email: ${booking.clientEmail}\n` +
-            `Phone: ${booking.clientPhone || "-"}\n` +
-            `Client Message:\n${booking.message || "(No message provided)"}\n\n` +
-            `Please reach out to the client at your earliest convenience.\n` +
-            `Update the booking status in your consultant dashboard when you have contacted them.\n`;
+          const { html: consultantHtml, text: consultantText } = getConsultantNotificationTemplate(
+            booking.bookingRef,
+            booking.service.title,
+            booking.clientName,
+            booking.clientEmail,
+            booking.clientPhone || null,
+            booking.message || null
+          );
 
-          await transporter.sendMail({
-            from: process.env.SMTP_FROM || process.env.SMTP_USER,
+          await sendEmail({
+            from: resendFromEmail,
             to: assignedConsultant.email,
             subject: `New Client Inquiry: ${booking.service.title} (${booking.bookingRef})`,
+            html: consultantHtml,
             text: consultantText,
           });
         }
