@@ -331,7 +331,7 @@ export default function About() {
                   <div className="gallery-carousel-wrapper">
                     <div className="gallery-carousel-slide">
                       <img
-                        src={`http://localhost:5000${projectImages[projectIndex].imageUrl}`}
+                        src={projectImages[projectIndex].imageUrl.startsWith("http") ? projectImages[projectIndex].imageUrl : `${import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5000"}${projectImages[projectIndex].imageUrl}`}
                         alt={projectImages[projectIndex].title || "Project"}
                       />
                       {projectImages[projectIndex].title && (
@@ -360,7 +360,7 @@ export default function About() {
                   <div className="gallery-carousel-wrapper">
                     <div className="gallery-carousel-slide">
                       <img
-                        src={`http://localhost:5000${worksiteImages[worksiteIndex].imageUrl}`}
+                        src={worksiteImages[worksiteIndex].imageUrl.startsWith("http") ? worksiteImages[worksiteIndex].imageUrl : `${import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5000"}${worksiteImages[worksiteIndex].imageUrl}`}
                         alt={worksiteImages[worksiteIndex].title || "Worksite"}
                       />
                       {worksiteImages[worksiteIndex].title && (
@@ -389,7 +389,7 @@ export default function About() {
                   <div className="gallery-carousel-wrapper">
                     <div className="gallery-carousel-slide">
                       <img
-                        src={`http://localhost:5000${serviceImages[serviceIndex].imageUrl}`}
+                        src={serviceImages[serviceIndex].imageUrl.startsWith("http") ? serviceImages[serviceIndex].imageUrl : `${import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5000"}${serviceImages[serviceIndex].imageUrl}`}
                         alt={serviceImages[serviceIndex].title || "Service"}
                       />
                       {serviceImages[serviceIndex].title && (
@@ -443,7 +443,19 @@ export default function About() {
                 onScroll={checkScroll}
               >
                 {team.map((member) => {
-                  const imageUrl = member.imageUrl ? `http://localhost:5000${member.imageUrl}` : null;
+                  // Handle both Cloudinary URLs (full URLs) and local paths
+                  let imageUrl = null;
+                  if (member.imageUrl) {
+                    if (member.imageUrl.startsWith("http")) {
+                      // Cloudinary URL - use as is
+                      imageUrl = member.imageUrl;
+                    } else {
+                      // Local path - construct full URL using API base URL
+                      const apiBase = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+                      const baseUrl = apiBase.replace("/api", "");
+                      imageUrl = `${baseUrl}${member.imageUrl}`;
+                    }
+                  }
                   return (
                     <div className="team-card" key={member.id}>
                       {imageUrl ? (

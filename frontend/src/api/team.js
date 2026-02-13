@@ -32,6 +32,13 @@ export const updateTeamMember = (id, data) => {
   if (data.order !== undefined) formData.append("order", data.order);
   if (data.image) formData.append("image", data.image);
   if (data.isActive !== undefined) formData.append("isActive", data.isActive);
+  if (data.email) formData.append("email", data.email);
+  if (data.password) formData.append("password", data.password);
+  if (data.role) formData.append("role", data.role);
+  if (data.assignedServices && data.assignedServices.length > 0) {
+    formData.append("assignedServices", JSON.stringify(data.assignedServices));
+  }
+  if (data.isPublic !== undefined) formData.append("isPublic", data.isPublic);
 
   return http.patch(`/team/${id}`, formData).then(res => res.data);
 };

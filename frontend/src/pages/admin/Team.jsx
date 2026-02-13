@@ -428,7 +428,19 @@ export default function Team() {
           ) : team.length > 0 ? (
             <div className="team-list">
               {team.map((member) => {
-                const imageUrl = member.imageUrl ? `http://localhost:5000${member.imageUrl}` : null;
+                // Handle both Cloudinary URLs (full URLs) and local paths
+                let imageUrl = null;
+                if (member.imageUrl) {
+                  if (member.imageUrl.startsWith("http")) {
+                    // Cloudinary URL - use as is
+                    imageUrl = member.imageUrl;
+                  } else {
+                    // Local path - construct full URL using API base URL
+                    const apiBase = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+                    const baseUrl = apiBase.replace("/api", "");
+                    imageUrl = `${baseUrl}${member.imageUrl}`;
+                  }
+                }
                 return (
                   <div key={member.id} className="team-item">
                     {imageUrl && (
