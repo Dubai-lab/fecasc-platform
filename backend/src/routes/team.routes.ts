@@ -49,8 +49,11 @@ router.post("/", requireAdmin, upload.single("image"), async (req, res) => {
     // Parse order as integer
     const parsedOrder = order ? parseInt(String(order)) : 0;
     
-    // Generate image URL if file was uploaded (Cloudinary returns secure_url in path)
-    const imageUrl = req.file ? (req.file as any).path : null;
+    // Generate image URL - support both Cloudinary (path) and local storage (filename)
+    let imageUrl: string | null = null;
+    if (req.file) {
+      imageUrl = (req.file as any).path || `/uploads/team/${(req.file as any).filename}`;
+    }
 
     // Hash password if creating a staff member
     let passwordHash: string | null = null;
@@ -171,7 +174,10 @@ router.patch("/:id", requireAdmin, upload.single("image"), async (req, res) => {
     };
 
     // Generate image URL if file was uploaded (Cloudinary returns secure_url in path)
-    const imageUrl = req.file ? (req.file as any).path : undefined;
+    let imageUrl: string | undefined = undefined;
+    if (req.file) {
+      imageUrl = (req.file as any).path || `/uploads/team/${(req.file as any).filename}`;
+    }
 
     // Hash password if provided
     let passwordHash: string | undefined = undefined;

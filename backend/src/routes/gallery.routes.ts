@@ -70,7 +70,7 @@ router.post(
         return res.status(400).json({ message: "Invalid category" });
       }
 
-      const imageUrl = (req.file as any).path;
+      const imageUrl = (req.file as any).path || `/uploads/gallery/${category}/${(req.file as any).filename}`;
 
       const image = await prisma.galleryImage.create({
         data: {
