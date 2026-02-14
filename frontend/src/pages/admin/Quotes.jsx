@@ -2,14 +2,18 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AdminLayout from "../../components/admin/AdminLayout";
 import * as quotesApi from "../../api/quotes";
+import * as bookingsApi from "../../api/bookings";
 import "./Quotes.css";
 
 export default function Quotes() {
   const [quotes, setQuotes] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedQuote, setSelectedQuote] = useState(null);
   const [filterStatus, setFilterStatus] = useState("ALL");
+  const [formError, setFormError] = useState("");
+  const [formSuccess, setFormSuccess] = useState("");
 
   const [formData, setFormData] = useState({
     bookingId: "",
@@ -19,16 +23,25 @@ export default function Quotes() {
   });
 
   useEffect(() => {
-    fetchQuotes();
+    fetchData();
   }, []);
 
-  const fetchQuotes = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await quotesApi.getAllQuotes();
-      setQuotes(response || []);
+      const [quotesData, bookingsData] = await Promise.all([
+        quotesApi.getAllQuotes(),
+        bookingsApi.fetchBookings(),
+      ]);
+      setQuotes(quotesData || []);
+      
+      // Get bookings that don't have quotes yet
+      const usedBookingIds = (quotesData || []).map(q => q.bookingId);
+      const availableBookings = (bookingsData || []).filter(b => !usedBookingIds.includes(b.id));
+      setBookings(availableBookings);
     } catch (error) {
-      console.error("Error fetching quotes:", error);
+      console.error("Error fetching data:", error);
+      setFormError("Failed to load bookings and quotes");
     } finally {
       setLoading(false);
     }
@@ -62,14 +75,31 @@ export default function Quotes() {
 
   const handleCreateQuote = async (e) => {
     e.preventDefault();
-    if (!formData.bookingId || formData.lineItems.length === 0) {
-      alert("Please select a booking and add at least one line item");
+    setFormError("");
+    setFormSuccess("");
+
+    if (!formData.bookingId) {
+      setFormError("Please select a booking");
+      return;
+    }
+
+    if (formData.lineItems.length === 0) {
+      setFormError("Please add at least one line item");
+      return;
+    }
+
+    // Check if any line item is incomplete
+    const incomplete = formData.lineItems.some(item => 
+      !item.description.trim() || item.unitPrice <= 0
+    );
+    if (incomplete) {
+      setFormError("All line items must have a description and unit price");
       return;
     }
 
     try {
       await quotesApi.createQuote(formData);
-      alert("Quote created successfully!");
+      setFormSuccess("Quote created successfully!");
       setFormData({
         bookingId: "",
         lineItems: [{ description: "", quantity: 1, unitPrice: 0 }],
@@ -77,9 +107,10 @@ export default function Quotes() {
         internalNotes: "",
       });
       setShowCreateForm(false);
-      fetchQuotes();
+      setTimeout(() => fetchData(), 1500);
     } catch (error) {
-      alert("Error creating quote: " + (error.response?.data?.message || error.message));
+      const message = error.response?.data?.message || error.message || "Failed to create quote";
+      setFormError("Error creating quote: " + message);
     }
   };
 
@@ -107,16 +138,27 @@ export default function Quotes() {
       {showCreateForm && (
         <div className="quote-form-card">
           <h2>Create New Quote</h2>
+          {formError && <div className="error-message">{formError}</div>}
+          {formSuccess && <div className="success-message">{formSuccess}</div>}
+          
           <form onSubmit={handleCreateQuote}>
             <div className="form-group">
-              <label>Booking ID *</label>
-              <input
-                type="text"
-                placeholder="Select or paste booking ID"
+              <label>Booking *</label>
+              <select
                 value={formData.bookingId}
                 onChange={(e) => setFormData({ ...formData, bookingId: e.target.value })}
                 required
-              />
+              >
+                <option value="">Select a booking</option>
+                {bookings.map(booking => (
+                  <option key={booking.id} value={booking.id}>
+                    {booking.id} - {booking.service?.name} ({booking.clientName})
+                  </option>
+                ))}
+              </select>
+              {bookings.length === 0 && (
+                <p className="info-text">No available bookings (all have quotes)</p>
+              )}
             </div>
 
             <div className="line-items-section">
@@ -260,7 +302,7 @@ export default function Quotes() {
         <QuoteDetailModal
           quote={selectedQuote}
           onClose={() => setSelectedQuote(null)}
-          onRefresh={fetchQuotes}
+          onRefresh={fetchData}
         />
       )}
     </div>
