@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import http from "../../api/http";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import * as invoicesApi from "../../api/invoices";
 import "./Dashboard.css";
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
     bookings: 0,
     services: 0,
+    quotes: 0,
+    invoices: 0,
+    revenue: 0,
   });
   const [chartData, setChartData] = useState([]);
   const [serviceData, setServiceData] = useState([]);
@@ -18,18 +22,25 @@ export default function Dashboard() {
 
     async function loadStats() {
       try {
-        const [bookingsRes, servicesRes] = await Promise.all([
+        const [bookingsRes, servicesRes, quotesRes, invoiceSummaryRes] = await Promise.all([
           http.get("/bookings"),
           http.get("/services/all"),
+          http.get("/quotes"),
+          invoicesApi.getDashboardSummary(),
         ]);
         
         if (mounted) {
           const bookings = bookingsRes.data;
           const services = servicesRes.data;
+          const quotes = quotesRes.data || [];
+          const invoiceSummary = invoiceSummaryRes.data || { totalRevenue: 0, totalInvoices: 0 };
           
           setStats({
             bookings: bookings.length,
             services: services.length,
+            quotes: quotes.length || 0,
+            invoices: invoiceSummary.totalInvoices || 0,
+            revenue: invoiceSummary.totalRevenue || 0,
           });
 
           // Group bookings by day of week
@@ -130,7 +141,7 @@ export default function Dashboard() {
           <div className="stat-card">
             <div className="stat-card__icon">📋</div>
             <div className="stat-card__label">Total Bookings</div>
-            <div className="stat-card__value" style={{ color: "#1a8f6a" }}>
+            <div className="stat-card__value" style={{ color: "#16a34a" }}>
               {loading ? "—" : stats.bookings}
             </div>
           </div>
@@ -138,8 +149,24 @@ export default function Dashboard() {
           <div className="stat-card">
             <div className="stat-card__icon">⚙️</div>
             <div className="stat-card__label">Total Services</div>
-            <div className="stat-card__value" style={{ color: "#11624a" }}>
+            <div className="stat-card__value" style={{ color: "#15803d" }}>
               {loading ? "—" : stats.services}
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-card__icon">📄</div>
+            <div className="stat-card__label">Active Quotes</div>
+            <div className="stat-card__value" style={{ color: "#16a34a" }}>
+              {loading ? "—" : stats.quotes}
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-card__icon">💰</div>
+            <div className="stat-card__label">Total Revenue</div>
+            <div className="stat-card__value" style={{ color: "#16a34a" }}>
+              {loading ? "—" : `L$${(stats.revenue || 0).toLocaleString()}`}
             </div>
           </div>
         </div>
@@ -150,6 +177,12 @@ export default function Dashboard() {
           <div className="actions-grid">
             <a href="/admin/bookings" className="action-btn" style={{ background: "#11624a" }} onMouseOver={(e) => e.target.style.background = "#0b3d2e"} onMouseOut={(e) => e.target.style.background = "#11624a"}>
               View All Bookings
+            </a>
+            <a href="/admin/quotes" className="action-btn" style={{ background: "#16a34a" }} onMouseOver={(e) => e.target.style.background = "#15803d"} onMouseOut={(e) => e.target.style.background = "#16a34a"}>
+              Manage Quotes
+            </a>
+            <a href="/admin/invoices" className="action-btn" style={{ background: "#16a34a" }} onMouseOver={(e) => e.target.style.background = "#15803d"} onMouseOut={(e) => e.target.style.background = "#16a34a"}>
+              View Invoices
             </a>
             <a href="/admin/services" className="action-btn" style={{ background: "#1a8f6a" }} onMouseOver={(e) => e.target.style.background = "#11624a"} onMouseOut={(e) => e.target.style.background = "#1a8f6a"}>
               Manage Services

@@ -54,6 +54,9 @@ model TeamMember {
   // Relations - assigned bookings
   assignedBookings Booking[]
 
+  // Quotes created by this consultant/admin
+  createdQuotes Quote[] @relation("CreatedQuotes")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -74,6 +77,10 @@ model Booking {
   // Service reference
   serviceId String
   service   Service @relation(fields: [serviceId], references: [id])
+
+  // Quote and Invoice
+  quote   Quote?
+  invoice Invoice?
 
   // Tracking
   consultantNotifiedAt   DateTime? // When consultant was emailed
@@ -105,4 +112,127 @@ enum BookingStatus {
   ASSIGNED // Consultant assigned and notified
   AWAITING_CLIENT // Consultant has reached out, waiting for client response
   COMPLETED // Project completed or closed
+}
+
+enum QuoteStatus {
+  DRAFT // Quote being prepared
+  SENT // Quote sent to client
+  VIEWED // Client has opened/viewed quote
+  APPROVED // Client approved the quote
+  REJECTED // Client rejected the quote
+  NEGOTIATING // Client sent counter-offer or questions
+}
+
+enum InvoiceStatus {
+  GENERATED // Invoice created
+  SENT // Invoice sent to client
+  PAID // Payment confirmed
+  OVERDUE // Payment due date passed
+  CANCELLED // Invoice cancelled
+}
+
+enum DeliveryMethod {
+  EMAIL
+  WHATSAPP
+  SECURE_LINK
+}
+
+model Quote {
+  id        String @id @default(uuid())
+  bookingId String @unique
+
+  // Created by consultant or admin
+  createdById String
+  createdBy   TeamMember @relation("CreatedQuotes", fields: [createdById], references: [id])
+
+  // Quote details
+  lineItems     LineItem[]
+  totalAmount   Float
+  notes         String? // Notes visible to client
+  internalNotes String? // Admin only notes
+
+  // Delivery tracking
+  deliveryMethod DeliveryMethod?
+  deliveryTime   DateTime?
+
+  // Client response tracking
+  clientResponse String? // "EMAIL_REPLY", "WHATSAPP_REPLY", "PORTAL_APPROVAL", "PORTAL_REJECTION"
+  clientMessage  String? // Any message from client about the quote
+  responseTime   DateTime?
+
+  // Status
+  status QuoteStatus @default(DRAFT)
+
+  // Agreement signing
+  agreedAt     DateTime?
+  signedPdfUrl String? // URL to client uploaded signed PDF
+  verifiedAt   DateTime? // When admin verified the signed document
+  verifiedById String? // Admin who verified
+  isLocked     Boolean   @default(false) // Locked after client signs
+
+  // Relations
+  booking Booking  @relation(fields: [bookingId], references: [id])
+  invoice Invoice?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LineItem {
+  id      String @id @default(uuid())
+  quoteId String
+
+  description String // "Site inspection", "Lab analysis", etc
+  quantity    Float  @default(1)
+  unitPrice   Float
+  total       Float // quantity * unitPrice
+
+  quote Quote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model Invoice {
+  id        String @id @default(uuid())
+  quoteId   String @unique
+  bookingId String @unique
+
+  // Payment details
+  totalAmount      Float
+  bankAccount      String // "GTBANK" or "UBA"
+  accountName      String?
+  accountNumber    String?
+  paymentReference String?
+
+  // Status
+  status  InvoiceStatus @default(GENERATED)
+  sentAt  DateTime?
+  dueDate DateTime
+  paidAt  DateTime?
+
+  // Relations
+  quote         Quote          @relation(fields: [quoteId], references: [id])
+  booking       Booking        @relation(fields: [bookingId], references: [id])
+  paymentProofs PaymentProof[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PaymentProof {
+  id        String @id @default(uuid())
+  invoiceId String
+
+  // File/receipt details
+  proofUrl   String // URL to bank transfer receipt/proof
+  uploadedAt DateTime @default(now())
+
+  // Verification
+  verifiedAt        DateTime?
+  verifiedById      String? // Admin who verified
+  verificationNotes String?
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }

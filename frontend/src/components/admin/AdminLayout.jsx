@@ -1,12 +1,13 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { getAdmin, logoutAdmin } from "../../api/auth";
+import { getAdmin, logoutAdmin, getUserType } from "../../api/auth";
 import "./AdminLayout.css";
 
 export default function AdminLayout({ title, children }) {
   const loc = useLocation();
   const nav = useNavigate();
   const admin = getAdmin();
+  const userType = getUserType();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   function onLogout() {
@@ -23,16 +24,29 @@ export default function AdminLayout({ title, children }) {
           <div className="side__logo">F</div>
           <div>
             <div className="side__name">FECASC</div>
-            <div className="side__muted">Admin Panel</div>
+            <div className="side__muted">{userType === "staff" ? "Consultant Panel" : "Admin Panel"}</div>
           </div>
         </div>
 
         <nav className="side__nav">
-          <Link className={active("/admin")} to="/admin" onClick={() => setSidebarOpen(false)}>Dashboard</Link>
-          <Link className={active("/admin/bookings")} to="/admin/bookings" onClick={() => setSidebarOpen(false)}>Bookings</Link>
-          <Link className={active("/admin/services")} to="/admin/services" onClick={() => setSidebarOpen(false)}>Services</Link>
-          <Link className={active("/admin/team")} to="/admin/team" onClick={() => setSidebarOpen(false)}>Team</Link>
-          <Link className={active("/admin/gallery")} to="/admin/gallery" onClick={() => setSidebarOpen(false)}>Gallery</Link>
+          {userType === "admin" && (
+            <>
+              <Link className={active("/admin")} to="/admin" onClick={() => setSidebarOpen(false)}>Dashboard</Link>
+              <Link className={active("/admin/bookings")} to="/admin/bookings" onClick={() => setSidebarOpen(false)}>Bookings</Link>
+              <Link className={active("/admin/services")} to="/admin/services" onClick={() => setSidebarOpen(false)}>Services</Link>
+              <Link className={active("/admin/quotes")} to="/admin/quotes" onClick={() => setSidebarOpen(false)}>Quotes</Link>
+              <Link className={active("/admin/invoices")} to="/admin/invoices" onClick={() => setSidebarOpen(false)}>Invoices</Link>
+              <Link className={active("/admin/team")} to="/admin/team" onClick={() => setSidebarOpen(false)}>Team</Link>
+              <Link className={active("/admin/gallery")} to="/admin/gallery" onClick={() => setSidebarOpen(false)}>Gallery</Link>
+            </>
+          )}
+          {userType === "staff" && (
+            <>
+              <Link className={active("/consultant/dashboard")} to="/consultant/dashboard" onClick={() => setSidebarOpen(false)}>Dashboard</Link>
+              <Link className={active("/consultant/quotes")} to="/consultant/quotes" onClick={() => setSidebarOpen(false)}>My Quotes</Link>
+              <Link className={active("/consultant/invoices")} to="/consultant/invoices" onClick={() => setSidebarOpen(false)}>My Invoices</Link>
+            </>
+          )}
         </nav>
 
         <div className="side__bottom">

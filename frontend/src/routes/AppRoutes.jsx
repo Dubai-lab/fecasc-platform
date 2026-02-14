@@ -13,10 +13,14 @@ import Bookings from "../pages/admin/Bookings";
 import AdminServices from "../pages/admin/Services";
 import Team from "../pages/admin/Team";
 import Gallery from "../pages/admin/Gallery";
+import Quotes from "../pages/admin/Quotes";
+import Invoices from "../pages/admin/Invoices";
 import BookServices from "../pages/BookServices";
 
 // Consultant pages
 import ConsultantDashboard from "../pages/consultant/ConsultantDashboard";
+import ConsultantQuotes from "../pages/consultant/ConsultantQuotes";
+import ConsultantInvoices from "../pages/consultant/ConsultantInvoices";
 
 
 export default function AppRoutes() {
@@ -78,12 +82,48 @@ export default function AppRoutes() {
         }
       />
 
+      <Route
+        path="/admin/quotes"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <Quotes />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/invoices"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <Invoices />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Consultant/Staff Routes */}
       <Route
         path="/consultant/dashboard"
         element={
           <ProtectedRoute requiredRole="staff">
             <ConsultantDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/consultant/quotes"
+        element={
+          <ProtectedRoute requiredRole="staff">
+            <ConsultantQuotes />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/consultant/invoices"
+        element={
+          <ProtectedRoute requiredRole="staff">
+            <ConsultantInvoices />
           </ProtectedRoute>
         }
       />

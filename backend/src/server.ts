@@ -9,6 +9,8 @@ import servicesRoutes from "./routes/services.routes.js";
 import bookingsRoutes from "./routes/bookings.routes.js";
 import teamRoutes from "./routes/team.routes.js";
 import galleryRoutes from "./routes/gallery.routes.js";
+import quotesRoutes from "./routes/quotes.routes.js";
+import invoicesRoutes from "./routes/invoices.routes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -26,6 +28,8 @@ app.use("/api/services", servicesRoutes);
 app.use("/api/bookings", bookingsRoutes);
 app.use("/api/team", teamRoutes);
 app.use("/api/gallery", galleryRoutes);
+app.use("/api/quotes", quotesRoutes);
+app.use("/api/invoices", invoicesRoutes);
 
 const PORT = Number(process.env.PORT || 5000);
 const HOST = process.env.HOST || "0.0.0.0";

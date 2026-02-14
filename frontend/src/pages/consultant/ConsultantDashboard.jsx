@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getMyBookings, updateBookingStatus, getConsultantProfile, logoutConsultant } from "../../api/consultant";
+import { getMyBookings, getConsultantProfile, logoutConsultant } from "../../api/consultant";
 import { logoutAdmin } from "../../api/auth";
+import * as quotesApi from "../../api/quotes";
+import * as invoicesApi from "../../api/invoices";
 import http from "../../api/http";
 import "./ConsultantDashboard.css";
 
@@ -23,6 +25,8 @@ export default function ConsultantDashboard() {
   const navigate = useNavigate();
   const [consultant, setConsultant] = useState(null);
   const [bookings, setBookings] = useState([]);
+  const [quotes, setQuotes] = useState([]);
+  const [invoiceSummary, setInvoiceSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedBooking, setSelectedBooking] = useState(null);
@@ -40,6 +44,8 @@ export default function ConsultantDashboard() {
     }
     setConsultant(profile);
     loadBookings();
+    loadQuotes();
+    loadRevenue();
   }, [navigate]);
 
   const loadBookings = async () => {
@@ -52,6 +58,24 @@ export default function ConsultantDashboard() {
       setError(err?.response?.data?.message || "Failed to load bookings");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadQuotes = async () => {
+    try {
+      const data = await quotesApi.getAllQuotes();
+      setQuotes(data);
+    } catch (err) {
+      console.error("Failed to load quotes", err);
+    }
+  };
+
+  const loadRevenue = async () => {
+    try {
+      const data = await invoicesApi.getDashboardSummary();
+      setInvoiceSummary(data);
+    } catch (err) {
+      console.error("Failed to load revenue summary", err);
     }
   };
 
@@ -85,6 +109,11 @@ export default function ConsultantDashboard() {
     awaiting: bookings.filter(b => b.status === "ASSIGNED" || b.status === "NEW").length,
     inProgress: bookings.filter(b => b.status === "AWAITING_CLIENT").length,
     completed: bookings.filter(b => b.status === "COMPLETED").length,
+    quotesTotal: quotes.length,
+    quotesApproved: quotes.filter(q => q.status === "APPROVED").length,
+    totalRevenue: invoiceSummary?.totalRevenue || 0,
+    totalInvoices: invoiceSummary?.totalInvoices || 0,
+    quotesPending: quotes.filter(q => q.status === "SENT" || q.status === "VIEWED").length,
   };
 
   // Filter bookings based on selected status
@@ -177,8 +206,20 @@ export default function ConsultantDashboard() {
                 <div style={{ fontSize: "13px", opacity: 0.9 }}>Completed</div>
               </div>
               <div style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", padding: "16px" }}>
+                <div style={{ fontSize: "24px", fontWeight: "900", marginBottom: "4px" }}>{stats.quotesPending}</div>
+                <div style={{ fontSize: "13px", opacity: 0.9 }}>Pending Quotes</div>
+              </div>
+              <div style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", padding: "16px" }}>
+                <div style={{ fontSize: "24px", fontWeight: "900", marginBottom: "4px" }}>{stats.quotesApproved}</div>
+                <div style={{ fontSize: "13px", opacity: 0.9 }}>Approved Quotes</div>
+              </div>
+              <div style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", padding: "16px" }}>
                 <div style={{ fontSize: "24px", fontWeight: "900", marginBottom: "4px" }}>{stats.total}</div>
-                <div style={{ fontSize: "13px", opacity: 0.9 }}>Total</div>
+                <div style={{ fontSize: "13px", opacity: 0.9 }}>Total Bookings</div>
+              </div>
+              <div style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", padding: "16px" }}>
+                <div style={{ fontSize: "24px", fontWeight: "900", marginBottom: "4px" }}>L${(stats.totalRevenue || 0).toLocaleString()}</div>
+                <div style={{ fontSize: "13px", opacity: 0.9 }}>Total Revenue</div>
               </div>
             </div>
           </div>
@@ -208,6 +249,60 @@ export default function ConsultantDashboard() {
               </div>
             </div>
           )}
+
+          {/* Quick Actions */}
+          <div style={{ marginBottom: "24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
+            <a href="/consultant/quotes" style={{
+              background: "linear-gradient(135deg, #16a34a 0%, #15803d 100%)",
+              color: "white",
+              padding: "16px",
+              borderRadius: "12px",
+              textDecoration: "none",
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+              border: "1px solid rgba(255,255,255,0.2)",
+              transition: "all 0.3s",
+              cursor: "pointer",
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 8px 20px rgba(22, 163, 74, 0.3)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "none";
+            }}>
+              <div style={{ fontSize: "24px" }}>📄</div>
+              <div style={{ fontWeight: "700", fontSize: "14px" }}>Manage Quotes</div>
+              <div style={{ fontSize: "12px", opacity: 0.9 }}>{stats.quotesTotal} total • {stats.quotesPending} pending</div>
+            </a>
+            <a href="/consultant/invoices" style={{
+              background: "linear-gradient(135deg, #16a34a 0%, #15803d 100%)",
+              color: "white",
+              padding: "16px",
+              borderRadius: "12px",
+              textDecoration: "none",
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+              border: "1px solid rgba(255,255,255,0.2)",
+              transition: "all 0.3s",
+              cursor: "pointer",
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 8px 20px rgba(22, 163, 74, 0.3)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "none";
+            }}>
+              <div style={{ fontSize: "24px" }}>💰</div>
+              <div style={{ fontWeight: "700", fontSize: "14px" }}>View Invoices</div>
+              <div style={{ fontSize: "12px", opacity: 0.9 }}>Track your revenue</div>
+            </a>
+          </div>
 
           {/* Status Filter Tabs */}
           <div style={{ marginBottom: "24px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
@@ -336,7 +431,7 @@ export default function ConsultantDashboard() {
                   }}
                   onMouseOver={(e) => {
                     e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
-                   e.currentTarget.style.borderColor = "#1a8f6a";
+                   e.currentTarget.style.borderColor = "#0369a1";
                   }}
                   onMouseOut={(e) => {
                     e.currentTarget.style.boxShadow = "none";
@@ -373,7 +468,7 @@ export default function ConsultantDashboard() {
                     <div>📧 <b>Email:</b> {booking.clientEmail}</div>
                     {booking.clientPhone && <div>📱 <b>Phone:</b> {booking.clientPhone}</div>}
                     {booking.message && (
-                      <div style={{ marginTop: "8px", padding: "8px 12px", background: "white", borderRadius: "6px", borderLeft: "3px solid #1a8f6a" }}>
+                      <div style={{ marginTop: "8px", padding: "8px 12px", background: "white", borderRadius: "6px", borderLeft: "3px solid #0369a1" }}>
                         <div style={{ fontSize: 12, color: "#64748b", marginBottom: 4 }}>💬 Client Message:</div>
                         "{booking.message}"
                       </div>
@@ -409,7 +504,7 @@ export default function ConsultantDashboard() {
                           setNewNote("");
                         }}
                         style={{
-                          background: "#1a8f6a",
+                          background: "#0369a1",
                           color: "white",
                           border: "none",
                           padding: "8px 12px",
@@ -418,8 +513,8 @@ export default function ConsultantDashboard() {
                           fontWeight: "700",
                           cursor: "pointer",
                         }}
-                        onMouseOver={(e) => (e.target.style.background = "#0b3d2e")}
-                        onMouseOut={(e) => (e.target.style.background = "#1a8f6a")}
+                        onMouseOver={(e) => (e.target.style.background = "#0c4a9e")}
+                        onMouseOut={(e) => (e.target.style.background = "#0369a1")}
                       >
                         ✍️ Log Contact
                       </button>
@@ -552,10 +647,10 @@ export default function ConsultantDashboard() {
                   opacity: addingNote ? 0.7 : 1,
                 }}
                 onMouseOver={(e) => {
-                  if (!addingNote) e.target.style.background = "#0b3d2e";
+                  if (!addingNote) e.target.style.background = "#0c4a9e";
                 }}
                 onMouseOut={(e) => {
-                  if (!addingNote) e.target.style.background = "#1a8f6a";
+                  if (!addingNote) e.target.style.background = "#0369a1";
                 }}
               >
                 {addingNote ? "Saving..." : "✓ Save Note & Mark Progress"}
