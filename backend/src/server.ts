@@ -11,6 +11,7 @@ import teamRoutes from "./routes/team.routes.js";
 import galleryRoutes from "./routes/gallery.routes.js";
 import quotesRoutes from "./routes/quotes.routes.js";
 import invoicesRoutes from "./routes/invoices.routes.js";
+import blogRoutes from "./routes/blog.routes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -30,6 +31,7 @@ app.use("/api/team", teamRoutes);
 app.use("/api/gallery", galleryRoutes);
 app.use("/api/quotes", quotesRoutes);
 app.use("/api/invoices", invoicesRoutes);
+app.use("/api/blog", blogRoutes);
 
 const PORT = Number(process.env.PORT || 5000);
 const HOST = process.env.HOST || "0.0.0.0";

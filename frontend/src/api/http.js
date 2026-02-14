@@ -6,7 +6,8 @@ const http = axios.create({
 
 // Attach token automatically and handle FormData
 http.interceptors.request.use((config) => {
-  const token = localStorage.getItem("fecasc_token");
+  // Check for both admin and consultant tokens
+  const token = localStorage.getItem("fecasc_token") || localStorage.getItem("fecasc_consultant_token");
   if (token) config.headers.Authorization = `Bearer ${token}`;
   
   // Don't set Content-Type for FormData, let browser handle it

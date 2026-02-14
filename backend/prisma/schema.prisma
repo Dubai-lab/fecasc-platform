@@ -19,6 +19,8 @@ model Admin {
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
+
+  blogPosts BlogPost[]
 }
 
 model Service {
@@ -235,4 +237,77 @@ model PaymentProof {
   invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+}
+
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model BlogCategory {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  slug        String  @unique
+  description String?
+  order       Int     @default(0)
+  isActive    Boolean @default(true)
+
+  posts BlogPost[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BlogPost {
+  id               String  @id @default(uuid())
+  title            String
+  slug             String  @unique
+  excerpt          String // Short summary for listings
+  content          String // Full HTML content
+  featuredImageUrl String?
+
+  // Category and tags
+  categoryId String
+  category   BlogCategory @relation(fields: [categoryId], references: [id])
+  tags       String[] // Array of tag strings: ["environmental", "compliance", "sustainability"]
+
+  // Author (Admin who wrote it)
+  authorId String
+  author   Admin  @relation(fields: [authorId], references: [id])
+
+  // Publishing
+  status      BlogPostStatus @default(DRAFT)
+  publishedAt DateTime?
+
+  // SEO
+  metaDescription String?
+
+  // Stats
+  viewCount Int @default(0)
+
+  // Comments
+  comments BlogComment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BlogComment {
+  id     String   @id @default(uuid())
+  postId String
+  post   BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  // Commenter info
+  authorName  String
+  authorEmail String
+
+  // Content
+  content String
+
+  // Moderation
+  isApproved Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

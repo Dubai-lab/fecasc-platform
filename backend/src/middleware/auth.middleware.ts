@@ -41,3 +41,25 @@ export function requireStaff(req: AuthedRequest, res: Response, next: NextFuncti
     return res.status(401).json({ message: "Invalid token" });
   }
 }
+
+export function requireAdminOrStaff(req: AuthedRequest, res: Response, next: NextFunction) {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+
+  if (!token) return res.status(401).json({ message: "Missing token" });
+
+  try {
+    const decoded = verifyToken(token);
+    if ("adminId" in decoded) {
+      req.admin = { adminId: decoded.adminId, email: decoded.email };
+      return next();
+    }
+    if ("staffId" in decoded) {
+      req.staff = { staffId: decoded.staffId, email: decoded.email };
+      return next();
+    }
+    return res.status(403).json({ message: "Admin or Staff access required" });
+  } catch {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+}

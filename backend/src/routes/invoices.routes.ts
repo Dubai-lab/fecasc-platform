@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
-import { requireAdmin, requireStaff } from "../middleware/auth.middleware.js";
+import { requireAdmin, requireStaff, requireAdminOrStaff } from "../middleware/auth.middleware.js";
 import { sendEmail } from "../lib/mailer.js";
 
 const router = Router();
 
 // Admin/Consultant: POST /api/invoices - Generate invoice from approved quote
-router.post("/", requireStaff, async (req, res) => {
+router.post("/", requireAdminOrStaff, async (req, res) => {
   try {
     const { quoteId, dueDate, bankDetails } = req.body as {
       quoteId: string;
@@ -77,13 +77,41 @@ router.post("/", requireStaff, async (req, res) => {
 });
 
 // Admin/Consultant: GET /api/invoices - Get all invoices (with optional filters)
-router.get("/", requireStaff, async (req, res) => {
+router.get("/", requireAdminOrStaff, async (req: any, res) => {
   try {
     const { status, bookingId } = req.query;
+    const isAdmin = !!req.admin;
+    const staffId = req.staff?.staffId;
 
     const where: any = {};
     if (status) where.status = status;
     if (bookingId) where.bookingId = bookingId;
+
+    // For staff/consultants, filter by their assigned services
+    if (!isAdmin && staffId) {
+      const consultant = await prisma.teamMember.findUnique({
+        where: { id: staffId },
+        select: { assignedServices: true },
+      });
+
+      if (consultant?.assignedServices && consultant.assignedServices.length > 0) {
+        // Get bookings with the consultant's assigned services
+        const bookingsWithServices = await prisma.booking.findMany({
+          where: {
+            serviceId: {
+              in: consultant.assignedServices,
+            },
+          },
+          select: { id: true },
+        });
+
+        const bookingIds = bookingsWithServices.map((b) => b.id);
+        where.quote = { booking: { id: { in: bookingIds } } };
+      } else {
+        // Consultant has no assigned services, return empty array
+        return res.json([]);
+      }
+    }
 
     const invoices = await prisma.invoice.findMany({
       where,
@@ -132,7 +160,7 @@ router.get("/:invoiceId", async (req, res) => {
 });
 
 // Admin/Consultant: POST /api/invoices/:invoiceId/send - Send invoice to client
-router.post("/:invoiceId/send", requireStaff, async (req, res) => {
+router.post("/:invoiceId/send", requireAdminOrStaff, async (req, res) => {
   try {
     const invoiceId = String(req.params.invoiceId);
     const { message } = req.body as { message?: string };
@@ -363,12 +391,64 @@ router.patch("/:invoiceId/verify-payment", requireAdmin, async (req, res) => {
   }
 });
 
-// Admin: GET /api/invoices/dashboard/summary - Get financial dashboard summary
-router.get("/dashboard/summary", requireAdmin, async (req, res) => {
+// Admin/Consultant: GET /api/invoices/dashboard/summary - Get financial dashboard summary
+router.get("/dashboard/summary", requireAdminOrStaff, async (req: any, res) => {
   try {
+    // Check if user is admin or staff
+    const isAdmin = !!req.admin;
+    const staffId = req.staff?.staffId;
+
+    let whereClause: any = {};
+
+    if (!isAdmin && staffId) {
+      // For staff/consultants, only show revenue from their assigned services
+      const consultant = await prisma.teamMember.findUnique({
+        where: { id: staffId },
+        select: { assignedServices: true },
+      });
+
+      if (!consultant || !consultant.assignedServices || consultant.assignedServices.length === 0) {
+        // Consultant has no assigned services
+        return res.json({
+          totalRevenue: 0,
+          totalPaidCount: 0,
+          pendingRevenue: 0,
+          pendingCount: 0,
+          overdueRevenue: 0,
+          overdueCount: 0,
+          invoiceStats: [],
+          quoteStats: [],
+        });
+      }
+
+      // Get all bookings with the consultant's assigned services
+      const bookingsWithServices = await prisma.booking.findMany({
+        where: {
+          serviceId: {
+            in: consultant.assignedServices,
+          },
+        },
+        select: { id: true },
+      });
+
+      const bookingIds = bookingsWithServices.map((b) => b.id);
+
+      // Filter invoices to only those related to these bookings
+      whereClause = {
+        quote: {
+          booking: {
+            id: {
+              in: bookingIds,
+            },
+          },
+        },
+      };
+    }
+
     // Get invoice statistics
     const stats = await prisma.invoice.groupBy({
       by: ["status"],
+      where: whereClause,
       _sum: {
         totalAmount: true,
       },
@@ -379,7 +459,7 @@ router.get("/dashboard/summary", requireAdmin, async (req, res) => {
 
     // Get total revenue (paid invoices)
     const paidInvoices = await prisma.invoice.aggregate({
-      where: { status: "PAID" },
+      where: { ...whereClause, status: "PAID" },
       _sum: { totalAmount: true },
       _count: { id: true },
     });
@@ -387,6 +467,7 @@ router.get("/dashboard/summary", requireAdmin, async (req, res) => {
     // Get pending revenue (sent but not paid)
     const pendingInvoices = await prisma.invoice.aggregate({
       where: {
+        ...whereClause,
         status: {
           in: ["SENT"],
         },
@@ -399,6 +480,7 @@ router.get("/dashboard/summary", requireAdmin, async (req, res) => {
     const now = new Date();
     const overdueInvoices = await prisma.invoice.aggregate({
       where: {
+        ...whereClause,
         dueDate: { lt: now },
         status: {
           in: ["GENERATED", "SENT"],
@@ -409,10 +491,14 @@ router.get("/dashboard/summary", requireAdmin, async (req, res) => {
     });
 
     // Get quotes statistics
-    const quoteStats = await prisma.quote.groupBy({
-      by: ["status"],
-      _count: { id: true },
-    });
+    const quoteStatsQuery: any = { by: ["status"] };
+    if (!isAdmin && staffId) {
+      quoteStatsQuery.where = {
+        createdById: staffId,
+      };
+    }
+
+    const quoteStats = await prisma.quote.groupBy(quoteStatsQuery);
 
     res.json({
       totalRevenue: paidInvoices._sum?.totalAmount || 0,

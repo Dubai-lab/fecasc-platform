@@ -38,6 +38,8 @@ export default function AdminLayout({ title, children }) {
               <Link className={active("/admin/invoices")} to="/admin/invoices" onClick={() => setSidebarOpen(false)}>Invoices</Link>
               <Link className={active("/admin/team")} to="/admin/team" onClick={() => setSidebarOpen(false)}>Team</Link>
               <Link className={active("/admin/gallery")} to="/admin/gallery" onClick={() => setSidebarOpen(false)}>Gallery</Link>
+              <Link className={active("/admin/blog")} to="/admin/blog" onClick={() => setSidebarOpen(false)}>Blog</Link>
+              <Link className={active("/admin/comments")} to="/admin/comments" onClick={() => setSidebarOpen(false)}>Comments</Link>
             </>
           )}
           {userType === "staff" && (

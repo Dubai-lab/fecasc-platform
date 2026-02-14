@@ -5,6 +5,8 @@ import Home from "../pages/Home";
 import About from "../pages/About";
 import Services from "../pages/Services";
 import Contact from "../pages/Contact";
+import Blog from "../pages/Blog";
+import BlogPost from "../pages/BlogPost";
 
 // Admin pages
 import Login from "../pages/admin/Login";
@@ -15,6 +17,8 @@ import Team from "../pages/admin/Team";
 import Gallery from "../pages/admin/Gallery";
 import Quotes from "../pages/admin/Quotes";
 import Invoices from "../pages/admin/Invoices";
+import AdminBlog from "../pages/admin/Blog";
+import Comments from "../pages/admin/Comments";
 import BookServices from "../pages/BookServices";
 
 // Consultant pages
@@ -32,6 +36,8 @@ export default function AppRoutes() {
       <Route path="/services" element={<Services />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/book" element={<BookServices />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/blog/:slug" element={<BlogPost />} />
 
       {/* Unified Login */}
       <Route path="/admin/login" element={<Login />} />
@@ -96,6 +102,24 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute requiredRole="admin">
             <Invoices />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/blog"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminBlog />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/comments"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <Comments />
           </ProtectedRoute>
         }
       />

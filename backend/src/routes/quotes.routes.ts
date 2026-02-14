@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
-import { requireAdmin, requireStaff } from "../middleware/auth.middleware.js";
+import { requireAdmin, requireStaff, requireAdminOrStaff } from "../middleware/auth.middleware.js";
 import { sendEmail } from "../lib/mailer.js";
 
 const router = Router();
 
 // Admin/Consultant: POST /api/quotes - Create a new quote
-router.post("/", requireStaff, async (req, res) => {
+router.post("/", requireAdminOrStaff, async (req, res) => {
   try {
     const { bookingId, lineItems, notes, internalNotes } = req.body as {
       bookingId: string;
@@ -39,7 +39,7 @@ router.post("/", requireStaff, async (req, res) => {
     }
 
     // Get authenticated user ID from request (from middleware)
-    const createdById = (req as any).user?.id;
+    const createdById = (req as any).admin?.adminId || (req as any).staff?.staffId;
     if (!createdById) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -142,8 +142,63 @@ router.get("/:quoteId", async (req, res) => {
   }
 });
 
+// Admin/Consultant: GET /api/quotes - Get all quotes
+router.get("/", requireAdminOrStaff, async (req: any, res) => {
+  try {
+    const isAdmin = !!req.admin;
+    const staffId = req.staff?.staffId;
+
+    const where: any = {};
+
+    // For staff/consultants, filter by their assigned services
+    if (!isAdmin && staffId) {
+      const consultant = await prisma.teamMember.findUnique({
+        where: { id: staffId },
+        select: { assignedServices: true },
+      });
+
+      if (consultant?.assignedServices && consultant.assignedServices.length > 0) {
+        // Get bookings with the consultant's assigned services
+        const bookingsWithServices = await prisma.booking.findMany({
+          where: {
+            serviceId: {
+              in: consultant.assignedServices,
+            },
+          },
+          select: { id: true },
+        });
+
+        const bookingIds = bookingsWithServices.map((b) => b.id);
+        where.booking = { id: { in: bookingIds } };
+      } else {
+        // Consultant has no assigned services, return empty array
+        return res.json([]);
+      }
+    }
+
+    const quotes = await prisma.quote.findMany({
+      where,
+      include: {
+        lineItems: true,
+        createdBy: {
+          select: { id: true, name: true, email: true, title: true },
+        },
+        booking: {
+          include: { service: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.json(quotes);
+  } catch (e: any) {
+    console.error("GET /quotes Error:", e);
+    res.status(500).json({ message: "Failed to fetch quotes" });
+  }
+});
+
 // Admin/Consultant: PATCH /api/quotes/:quoteId - Update quote (only in DRAFT status)
-router.patch("/:quoteId", requireStaff, async (req, res) => {
+router.patch("/:quoteId", requireAdminOrStaff, async (req, res) => {
   try {
     const quoteId = String(req.params.quoteId);
     const { lineItems, notes, internalNotes } = req.body;
@@ -219,7 +274,7 @@ router.patch("/:quoteId", requireStaff, async (req, res) => {
 });
 
 // Admin/Consultant: POST /api/quotes/:quoteId/send - Send quote to client
-router.post("/:quoteId/send", requireStaff, async (req, res) => {
+router.post("/:quoteId/send", requireAdminOrStaff, async (req, res) => {
   try {
     const quoteId = String(req.params.quoteId);
     const { deliveryMethod } = req.body as {
