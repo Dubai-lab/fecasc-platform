@@ -133,25 +133,32 @@ export default function Quotes() {
                     className="item-description"
                   />
                   <input
-                    type="number"
+                    type="text"
                     placeholder="Qty"
+                    inputMode="decimal"
+                    pattern="[0-9]*(\.[0-9]*)?"
                     value={item.quantity}
-                    onChange={(e) =>
-                      handleLineItemChange(index, "quantity", e.target.value)
-                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === '' || /^[0-9]*(\.[0-9]*)?$/.test(val)) {
+                        handleLineItemChange(index, "quantity", val ? parseFloat(val) : 0);
+                      }
+                    }}
                     className="item-qty"
-                    min="0.1"
-                    step="0.1"
                   />
                   <input
-                    type="number"
+                    type="text"
                     placeholder="Unit Price"
+                    inputMode="decimal"
+                    pattern="[0-9]*(\.[0-9]*)?"
                     value={item.unitPrice}
-                    onChange={(e) =>
-                      handleLineItemChange(index, "unitPrice", e.target.value)
-                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === '' || /^[0-9]*(\.[0-9]*)?$/.test(val)) {
+                        handleLineItemChange(index, "unitPrice", val ? parseFloat(val) : 0);
+                      }
+                    }}
                     className="item-price"
-                    min="0"
                   />
                   <span className="item-total">
                     L${(item.quantity * item.unitPrice).toLocaleString()}
