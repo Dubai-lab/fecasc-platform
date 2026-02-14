@@ -39,8 +39,10 @@ router.post("/", requireAdminOrStaff, async (req, res) => {
     }
 
     // Get authenticated user ID from request (from middleware)
-    const createdById = (req as any).admin?.adminId || (req as any).staff?.staffId;
-    if (!createdById) {
+    const adminId = (req as any).admin?.adminId;
+    const staffId = (req as any).staff?.staffId;
+
+    if (!adminId && !staffId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
@@ -54,7 +56,8 @@ router.post("/", requireAdminOrStaff, async (req, res) => {
     const quote = await prisma.quote.create({
       data: {
         bookingId,
-        createdById,
+        createdById: staffId || undefined,
+        adminCreatedById: adminId || undefined,
         notes: notes || null,
         internalNotes: internalNotes || null,
         totalAmount,
@@ -71,6 +74,7 @@ router.post("/", requireAdminOrStaff, async (req, res) => {
       include: {
         lineItems: true,
         createdBy: true,
+        adminCreatedBy: true,
         booking: {
           include: { service: true },
         },

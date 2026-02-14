@@ -20,7 +20,8 @@ model Admin {
   password  String
   createdAt DateTime @default(now())
 
-  blogPosts BlogPost[]
+  blogPosts     BlogPost[]
+  createdQuotes Quote[]    @relation("AdminCreatedQuotes")
 }
 
 model Service {
@@ -143,9 +144,12 @@ model Quote {
   id        String @id @default(uuid())
   bookingId String @unique
 
-  // Created by consultant or admin
-  createdById String
-  createdBy   TeamMember @relation("CreatedQuotes", fields: [createdById], references: [id])
+  // Created by consultant or admin (one must be set)
+  createdById String?
+  createdBy   TeamMember? @relation("CreatedQuotes", fields: [createdById], references: [id])
+
+  adminCreatedById String?
+  adminCreatedBy   Admin?  @relation("AdminCreatedQuotes", fields: [adminCreatedById], references: [id])
 
   // Quote details
   lineItems     LineItem[]
