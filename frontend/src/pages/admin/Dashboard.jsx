@@ -12,6 +12,9 @@ export default function Dashboard() {
     quotes: 0,
     invoices: 0,
     revenue: 0,
+    pendingRevenue: 0,
+    approvedQuotesRevenue: 0,
+    negotiatingQuotesRevenue: 0,
   });
   const [chartData, setChartData] = useState([]);
   const [serviceData, setServiceData] = useState([]);
@@ -33,7 +36,13 @@ export default function Dashboard() {
           const bookings = bookingsRes.data;
           const services = servicesRes.data;
           const quotes = quotesRes.data || [];
-          const invoiceSummary = invoiceSummaryRes.data || { totalRevenue: 0, totalInvoices: 0 };
+          const invoiceSummary = invoiceSummaryRes.data || { 
+            totalRevenue: 0, 
+            totalInvoices: 0,
+            pendingRevenue: 0,
+            approvedQuotesRevenue: 0,
+            negotiatingQuotesRevenue: 0,
+          };
           
           setStats({
             bookings: bookings.length,
@@ -41,6 +50,9 @@ export default function Dashboard() {
             quotes: quotes.length || 0,
             invoices: invoiceSummary.totalInvoices || 0,
             revenue: invoiceSummary.totalRevenue || 0,
+            pendingRevenue: invoiceSummary.pendingRevenue || 0,
+            approvedQuotesRevenue: invoiceSummary.approvedQuotesRevenue || 0,
+            negotiatingQuotesRevenue: invoiceSummary.negotiatingQuotesRevenue || 0,
           });
 
           // Group bookings by day of week
@@ -164,14 +176,36 @@ export default function Dashboard() {
 
           <div className="stat-card">
             <div className="stat-card__icon">💰</div>
-            <div className="stat-card__label">Total Revenue</div>
+            <div className="stat-card__label">Total Revenue (Paid)</div>
             <div className="stat-card__value" style={{ color: "#16a34a" }}>
               {loading ? "—" : `L$${(stats.revenue || 0).toLocaleString()}`}
             </div>
           </div>
-        </div>
 
-        {/* Quick Actions */}
+          <div className="stat-card">
+            <div className="stat-card__icon">⏳</div>
+            <div className="stat-card__label">Pending Revenue</div>
+            <div className="stat-card__value" style={{ color: "#f59e0b" }}>
+              {loading ? "—" : `L$${(stats.pendingRevenue || 0).toLocaleString()}`}
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-card__icon">✓</div>
+            <div className="stat-card__label">Approved Quotes Pipeline</div>
+            <div className="stat-card__value" style={{ color: "#3b82f6" }}>
+              {loading ? "—" : `L$${(stats.approvedQuotesRevenue || 0).toLocaleString()}`}
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-card__icon">💬</div>
+            <div className="stat-card__label">Negotiating Quotes</div>
+            <div className="stat-card__value" style={{ color: "#a855f7" }}>
+              {loading ? "—" : `L$${(stats.negotiatingQuotesRevenue || 0).toLocaleString()}`}
+            </div>
+          </div>
+        </div>
         <div className="actions-section">
           <h3>Quick Actions</h3>
           <div className="actions-grid">

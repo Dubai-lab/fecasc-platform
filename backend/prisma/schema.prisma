@@ -158,8 +158,9 @@ model Quote {
   internalNotes String? // Admin only notes
 
   // Delivery tracking
-  deliveryMethod DeliveryMethod?
-  deliveryTime   DateTime?
+  deliveryMethod  DeliveryMethod?
+  deliveryTime    DateTime?
+  deliveryMethods DeliveryMethod[] @default([]) // Track all methods used to send this quote
 
   // Client response tracking
   clientResponse String? // "EMAIL_REPLY", "WHATSAPP_REPLY", "PORTAL_APPROVAL", "PORTAL_REJECTION"

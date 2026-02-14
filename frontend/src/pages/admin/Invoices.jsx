@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import AdminLayout from "../../components/admin/AdminLayout";
 import * as invoicesApi from "../../api/invoices";
 import "./Invoices.css";
@@ -163,18 +162,24 @@ function InvoiceDetailModal({ invoice, onClose, onRefresh }) {
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [verifyNotes, setVerifyNotes] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSendInvoice = async () => {
     try {
       setSending(true);
-      await axios.post(`/api/invoices/${invoice.id}/send`, {}, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      alert("Invoice sent successfully!");
-      onRefresh();
-      onClose();
+      setErrorMessage("");
+      setSuccessMessage("");
+      
+      await invoicesApi.sendInvoice(invoice.id);
+      
+      setSuccessMessage("✓ Invoice sent successfully!");
+      setTimeout(() => {
+        onRefresh();
+        onClose();
+      }, 1500);
     } catch (error) {
-      alert("Error sending invoice: " + (error.response?.data?.message || error.message));
+      setErrorMessage("Error sending invoice: " + (error.response?.data?.message || error.message));
     } finally {
       setSending(false);
     }
@@ -183,16 +188,16 @@ function InvoiceDetailModal({ invoice, onClose, onRefresh }) {
   const handleVerifyPayment = async (verified) => {
     try {
       setVerifying(true);
-      await axios.patch(
-        `/api/invoices/${invoice.id}/verify-payment`,
-        { verified, notes: verifyNotes },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
-      alert(verified ? "Payment verified!" : "Payment verification rejected");
-      onRefresh();
-      onClose();
+      setErrorMessage("");
+      setSuccessMessage("");
+      await invoicesApi.verifyPayment(invoice.id, verified, verifyNotes);
+      setSuccessMessage(verified ? "✓ Payment verified!" : "✓ Payment verification rejected");
+      setTimeout(() => {
+        onRefresh();
+        onClose();
+      }, 1500);
     } catch (error) {
-      alert("Error verifying payment: " + (error.response?.data?.message || error.message));
+      setErrorMessage("Error verifying payment: " + (error.response?.data?.message || error.message));
     } finally {
       setVerifying(false);
     }
@@ -307,6 +312,8 @@ function InvoiceDetailModal({ invoice, onClose, onRefresh }) {
           {invoice.status === "GENERATED" && (
             <div className="action-section">
               <h3>Send to Client</h3>
+              {errorMessage && <div className="error-message">{errorMessage}</div>}
+              {successMessage && <div className="success-message">{successMessage}</div>}
               <button
                 className="btn-primary"
                 onClick={handleSendInvoice}

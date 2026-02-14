@@ -7,6 +7,7 @@ import Services from "../pages/Services";
 import Contact from "../pages/Contact";
 import Blog from "../pages/Blog";
 import BlogPost from "../pages/BlogPost";
+import QuoteApproval from "../pages/QuoteApproval";
 
 // Admin pages
 import Login from "../pages/admin/Login";
@@ -38,6 +39,7 @@ export default function AppRoutes() {
       <Route path="/book" element={<BookServices />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
+      <Route path="/quote-approval/:quoteId" element={<QuoteApproval />} />
 
       {/* Unified Login */}
       <Route path="/admin/login" element={<Login />} />

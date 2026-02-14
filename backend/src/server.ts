@@ -12,6 +12,7 @@ import galleryRoutes from "./routes/gallery.routes.js";
 import quotesRoutes from "./routes/quotes.routes.js";
 import invoicesRoutes from "./routes/invoices.routes.js";
 import blogRoutes from "./routes/blog.routes.js";
+import { runAutomatedReminders } from "./lib/automatedReminders.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -36,3 +37,29 @@ app.use("/api/blog", blogRoutes);
 const PORT = Number(process.env.PORT || 5000);
 const HOST = process.env.HOST || "0.0.0.0";
 app.listen(PORT, HOST, () => console.log(`Server running on http://localhost:${PORT}`));
+
+// Schedule automated reminders to run every 24 hours (at 9 AM)
+function scheduleAutomatedReminders() {
+  const now = new Date();
+  const scheduledTime = new Date();
+  scheduledTime.setHours(9, 0, 0, 0); // 9 AM
+
+  // If it's already past 9 AM, schedule for tomorrow
+  if (now > scheduledTime) {
+    scheduledTime.setDate(scheduledTime.getDate() + 1);
+  }
+
+  const timeUntilRun = scheduledTime.getTime() - now.getTime();
+
+  console.log(`[Automated Reminders] Next run scheduled for ${scheduledTime.toLocaleString()}`);
+
+  // First run
+  setTimeout(() => {
+    runAutomatedReminders();
+    // Then run every 24 hours
+    setInterval(() => runAutomatedReminders(), 24 * 60 * 60 * 1000);
+  }, timeUntilRun);
+}
+
+// Start automated reminders
+scheduleAutomatedReminders();

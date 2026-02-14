@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import AdminLayout from "../../components/admin/AdminLayout";
 import * as quotesApi from "../../api/quotes";
 import * as bookingsApi from "../../api/bookings";
@@ -352,19 +351,42 @@ function QuoteCard({ quote, onClick }) {
 
 function QuoteDetailModal({ quote, onClose, onRefresh }) {
   const [sending, setSending] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
   const [deliveryMethod, setDeliveryMethod] = useState("EMAIL");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSendQuote = async () => {
     try {
       setSending(true);
-      await axios.post(`/api/quotes/${quote.id}/send`, { deliveryMethod }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      alert(`Quote sent via ${deliveryMethod}!`);
-      onRefresh();
-      onClose();
+      setErrorMessage("");
+      setSuccessMessage("");
+      
+      const response = await quotesApi.sendQuote(quote.id, deliveryMethod);
+      
+      if (deliveryMethod === "WHATSAPP") {
+        if (response.whatsappLink) {
+          setSuccessMessage(`✓ Quote sent via WhatsApp! ${response.info}`);
+        } else {
+          setErrorMessage("WhatsApp delivery failed - client phone not provided.");
+        }
+      } else {
+        setSuccessMessage(`✓ Quote sent via ${deliveryMethod}! ${response.info || ""}`);
+      }
+
+      // Show which methods have been used
+      if (response.deliveryMethodsSent && response.deliveryMethodsSent.length > 1) {
+        setSuccessMessage(prev => 
+          prev + ` (Also sent via: ${response.deliveryMethodsSent.join(", ")})`
+        );
+      }
+
+      // Refresh quote data
+      setTimeout(() => {
+        onRefresh();
+      }, 500);
     } catch (error) {
-      alert("Error sending quote: " + (error.response?.data?.message || error.message));
+      setErrorMessage("Error sending quote: " + (error.response?.data?.message || error.message));
     } finally {
       setSending(false);
     }
@@ -396,6 +418,32 @@ function QuoteDetailModal({ quote, onClose, onRefresh }) {
               <span className="label">Total Amount:</span>
               <span className="value amount">L${quote.totalAmount.toLocaleString()}</span>
             </div>
+          </div>
+
+          <h3>📞 Client Contact Info</h3>
+          <div className="quote-details" style={{ backgroundColor: "#f9f9f9", padding: "12px", borderRadius: "4px", marginBottom: "20px" }}>
+            <div className="detail-row">
+              <span className="label">Client Name:</span>
+              <span className="value">{quote.booking?.clientName || "N/A"}</span>
+            </div>
+            <div className="detail-row">
+              <span className="label">Email:</span>
+              <span className="value">{quote.booking?.clientEmail || "N/A"}</span>
+            </div>
+            <div className="detail-row">
+              <span className="label">Phone:</span>
+              <span className="value">{quote.booking?.clientPhone || "⚠️ Not provided"}</span>
+            </div>
+            {!quote.booking?.clientPhone && (
+              <div style={{ color: "#d97706", fontSize: "12px", marginTop: "8px" }}>
+                ⚠️ Phone number not available. Add it to the booking to use WhatsApp delivery.
+              </div>
+            )}
+            {deliveryMethod === "WHATSAPP" && quote.booking?.clientPhone && (
+              <div style={{ color: "#059669", fontSize: "12px", marginTop: "8px" }}>
+                ℹ️ Client will receive an email with a WhatsApp button containing the approval link.
+              </div>
+            )}
           </div>
 
           <h3>Line Items</h3>
@@ -434,47 +482,63 @@ function QuoteDetailModal({ quote, onClose, onRefresh }) {
             </div>
           )}
 
-          {quote.status === "DRAFT" && (
-            <div className="send-section">
-              <h3>Send Quote to Client</h3>
-              <div className="delivery-options">
-                <label>
-                  <input
-                    type="radio"
-                    value="EMAIL"
-                    checked={deliveryMethod === "EMAIL"}
-                    onChange={(e) => setDeliveryMethod(e.target.value)}
-                  />
-                  📧 Email
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    value="WHATSAPP"
-                    checked={deliveryMethod === "WHATSAPP"}
-                    onChange={(e) => setDeliveryMethod(e.target.value)}
-                  />
-                  💬 WhatsApp
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    value="SECURE_LINK"
-                    checked={deliveryMethod === "SECURE_LINK"}
-                    onChange={(e) => setDeliveryMethod(e.target.value)}
-                  />
-                  🔗 Secure Link
-                </label>
+          <div className="send-section">
+            <h3>📤 Send Quote to Client</h3>
+            {errorMessage && <div className="error-message">{errorMessage}</div>}
+            {successMessage && <div className="success-message">{successMessage}</div>}
+
+            {quote.deliveryMethods && quote.deliveryMethods.length > 0 && (
+              <div style={{ 
+                backgroundColor: "#f0f9ff", 
+                border: "1px solid #93c5fd", 
+                padding: "12px", 
+                borderRadius: "4px", 
+                marginBottom: "16px",
+                fontSize: "13px"
+              }}>
+                <strong>✓ Already sent via:</strong> {quote.deliveryMethods.join(", ")} 
+                <br/>
+                <em style={{ color: "#666" }}>You can send to other channels below if needed</em>
               </div>
-              <button
-                className="btn-primary"
-                onClick={handleSendQuote}
-                disabled={sending}
-              >
-                {sending ? "Sending..." : "Send Quote"}
-              </button>
+            )}
+
+            <div className="delivery-options">
+              <label>
+                <input
+                  type="radio"
+                  value="EMAIL"
+                  checked={deliveryMethod === "EMAIL"}
+                  onChange={(e) => setDeliveryMethod(e.target.value)}
+                />
+                📧 Email
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="WHATSAPP"
+                  checked={deliveryMethod === "WHATSAPP"}
+                  onChange={(e) => setDeliveryMethod(e.target.value)}
+                />
+                💬 WhatsApp
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="SECURE_LINK"
+                  checked={deliveryMethod === "SECURE_LINK"}
+                  onChange={(e) => setDeliveryMethod(e.target.value)}
+                />
+                🔗 Secure Link
+              </label>
             </div>
-          )}
+            <button
+              className="btn-primary"
+              onClick={handleSendQuote}
+              disabled={sending}
+            >
+              {sending ? "Sending..." : "Send Quote"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

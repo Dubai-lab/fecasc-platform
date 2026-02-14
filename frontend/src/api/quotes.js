@@ -40,6 +40,22 @@ export const sendQuote = async (quoteId, deliveryMethod) => {
 
 /* Public/Client Endpoints (no auth required) */
 
+// Get public quote (client viewing approval page)
+export const getPublicQuote = async (quoteId) => {
+  const { data } = await http.get(`/quotes/${quoteId}/public`);
+  return data;
+};
+
+// Client approve quote
+export const clientApproveQuote = async (quoteId, approvalData) => {
+  const { data } = await http.post(
+    `/quotes/${quoteId}/client-approve`,
+    approvalData
+  );
+  return data;
+};
+
+// Approvethe old functions below are kept for backward compatibility
 // Client approve quote
 export const approveQuote = async (quoteId, email) => {
   const { data } = await http.post(

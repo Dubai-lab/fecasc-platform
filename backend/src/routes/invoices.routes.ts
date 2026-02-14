@@ -2,6 +2,7 @@ import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { requireAdmin, requireStaff, requireAdminOrStaff } from "../middleware/auth.middleware.js";
 import { sendEmail } from "../lib/mailer.js";
+import { getInvoiceEmailTemplate } from "../lib/templates/invoiceEmails.js";
 
 const router = Router();
 
@@ -117,7 +118,14 @@ router.get("/", requireAdminOrStaff, async (req: any, res) => {
       where,
       include: {
         quote: {
-          include: { lineItems: true },
+          select: {
+            id: true,
+            totalAmount: true,
+            notes: true,
+            status: true,
+            createdAt: true,
+            lineItems: true,
+          },
         },
         booking: true,
         paymentProofs: true,
@@ -141,7 +149,14 @@ router.get("/:invoiceId", async (req, res) => {
       where: { id: invoiceId },
       include: {
         quote: {
-          include: { lineItems: true },
+          select: {
+            id: true,
+            totalAmount: true,
+            notes: true,
+            status: true,
+            createdAt: true,
+            lineItems: true,
+          },
         },
         booking: true,
         paymentProofs: true,
@@ -163,13 +178,12 @@ router.get("/:invoiceId", async (req, res) => {
 router.post("/:invoiceId/send", requireAdminOrStaff, async (req, res) => {
   try {
     const invoiceId = String(req.params.invoiceId);
-    const { message } = req.body as { message?: string };
 
     const invoice = await prisma.invoice.findUnique({
       where: { id: invoiceId },
       include: {
         quote: {
-          include: { booking: true, lineItems: true },
+          include: { booking: true, lineItems: true, createdBy: true, adminCreatedBy: true },
         },
         booking: true,
         paymentProofs: true,
@@ -200,11 +214,38 @@ router.post("/:invoiceId/send", requireAdminOrStaff, async (req, res) => {
       },
     });
 
-    // TODO: Send email to client with invoice details and bank transfer instructions
-    console.log(
-      `Invoice ${invoiceId} sent to ${invoice.booking.clientEmail}`,
-      message
-    );
+    // Send email to client with invoice details
+    try {
+      const resendFromEmail = process.env.RESEND_FROM_EMAIL || "noreply@fecasc.com";
+      const creatorName = invoice.quote.createdBy?.name || invoice.quote.adminCreatedBy?.name || "Our Team";
+      const creatorEmail = invoice.quote.createdBy?.email || invoice.quote.adminCreatedBy?.email || process.env.COMPANY_NOTIFY_EMAIL;
+
+      const { html, text } = getInvoiceEmailTemplate(
+        invoice.booking.clientName,
+        invoiceId.substring(0, 8),
+        invoice.totalAmount,
+        new Date(invoice.dueDate),
+        invoice.bankAccount,
+        invoice.accountNumber || "",
+        invoice.accountName || "FECASC",
+        creatorName,
+        creatorEmail,
+        invoice.quote.lineItems
+      );
+
+      await sendEmail({
+        from: resendFromEmail,
+        to: invoice.booking.clientEmail,
+        subject: `Invoice from ${creatorName} - Reference: ${invoiceId.substring(0, 8).toUpperCase()}`,
+        html,
+        text,
+      });
+
+      console.log(`Invoice ${invoiceId} sent to ${invoice.booking.clientEmail}`);
+    } catch (emailError) {
+      console.error("Email sending error:", emailError);
+      // Don't fail the endpoint if email fails
+    }
 
     res.json({
       message: "Invoice sent successfully",
@@ -326,11 +367,12 @@ router.post("/:invoiceId/payment-proof", async (req, res) => {
 router.patch("/:invoiceId/verify-payment", requireAdmin, async (req, res) => {
   try {
     const invoiceId = String(req.params.invoiceId);
+    const verifiedById = (req as any).admin?.adminId;
     const { verified, notes } = req.body as { verified: boolean; notes?: string };
 
     const invoice = await prisma.invoice.findUnique({
       where: { id: invoiceId },
-      include: { paymentProofs: true },
+      include: { paymentProofs: true, booking: true, quote: { include: { createdBy: true, adminCreatedBy: true } } },
     });
 
     if (!invoice) {
@@ -362,10 +404,37 @@ router.patch("/:invoiceId/verify-payment", requireAdmin, async (req, res) => {
         where: { invoiceId },
         data: {
           verifiedAt: new Date(),
-          verifiedById: (req as any).user?.id,
+          verifiedById,
           verificationNotes: notes || null,
         },
       });
+
+      // Send payment confirmation email to client
+      try {
+        const resendFromEmail = process.env.RESEND_FROM_EMAIL || "noreply@fecasc.com";
+        const creatorName = invoice.quote.createdBy?.name || invoice.quote.adminCreatedBy?.name || "Our Team";
+
+        const html = `
+          <html>
+            <body style="font-family: Arial, sans-serif;">
+              <h2 style="color: #2a5298;">✓ Payment Confirmed</h2>
+              <p>Hi ${invoice.booking.clientName},</p>
+              <p>We have received and verified your payment of <strong>L$${invoice.totalAmount.toLocaleString()}</strong> for invoice <strong>${invoiceId.substring(0, 8).toUpperCase()}</strong>.</p>
+              <p>Thank you for your business! Our team will begin work on your project immediately.</p>
+              <p>Best regards,<br>${creatorName}</p>
+            </body>
+          </html>
+        `;
+
+        await sendEmail({
+          from: resendFromEmail,
+          to: invoice.booking.clientEmail,
+          subject: `Payment Confirmed - Invoice ${invoiceId.substring(0, 8).toUpperCase()}`,
+          html,
+        });
+      } catch (emailError) {
+        console.error("Error sending payment confirmation email:", emailError);
+      }
 
       res.json({
         message: "Payment verified and invoice marked as paid",
@@ -379,6 +448,33 @@ router.patch("/:invoiceId/verify-payment", requireAdmin, async (req, res) => {
           verificationNotes: notes || "Payment proof rejected",
         },
       });
+
+      // Send rejection email to client
+      try {
+        const resendFromEmail = process.env.RESEND_FROM_EMAIL || "noreply@fecasc.com";
+        
+        const html = `
+          <html>
+            <body style="font-family: Arial, sans-serif;">
+              <h2 style="color: #f57c00;">⚠ Payment Proof Rejected</h2>
+              <p>Hi ${invoice.booking.clientName},</p>
+              <p>We have reviewed your payment proof for invoice <strong>${invoiceId.substring(0, 8).toUpperCase()}</strong> but encountered some issues.</p>
+              ${notes ? `<p><strong>Reason:</strong> ${notes}</p>` : ""}
+              <p>Please resubmit the payment proof or contact us for assistance.</p>
+              <p>Best regards,<br>Our Team</p>
+            </body>
+          </html>
+        `;
+
+        await sendEmail({
+          from: resendFromEmail,
+          to: invoice.booking.clientEmail,
+          subject: `Payment Proof Needs Correction - Invoice ${invoiceId.substring(0, 8).toUpperCase()}`,
+          html,
+        });
+      } catch (emailError) {
+        console.error("Error sending rejection email:", emailError);
+      }
 
       res.json({
         message: "Payment verification rejected",
@@ -492,21 +588,50 @@ router.get("/dashboard/summary", requireAdminOrStaff, async (req: any, res) => {
 
     // Get quotes statistics
     const quoteStatsQuery: any = { by: ["status"] };
+    let quoteWhereClause: any = {};
+    
     if (!isAdmin && staffId) {
       quoteStatsQuery.where = {
+        createdById: staffId,
+      };
+      quoteWhereClause = {
         createdById: staffId,
       };
     }
 
     const quoteStats = await prisma.quote.groupBy(quoteStatsQuery);
 
+    // Get APPROVED quotes revenue (future revenue pipeline)
+    const approvedQuotes = await prisma.quote.aggregate({
+      where: {
+        ...quoteWhereClause,
+        status: "APPROVED",
+      },
+      _sum: { totalAmount: true },
+      _count: { id: true },
+    });
+
+    // Get NEGOTIATING quotes (at risk)
+    const negotiatingQuotes = await prisma.quote.aggregate({
+      where: {
+        ...quoteWhereClause,
+        status: "NEGOTIATING",
+      },
+      _sum: { totalAmount: true },
+      _count: { id: true },
+    });
+
     res.json({
       totalRevenue: paidInvoices._sum?.totalAmount || 0,
-      totalPaidCount: paidInvoices._count || 0,
+      totalPaidCount: paidInvoices._count?.id || 0,
       pendingRevenue: pendingInvoices._sum?.totalAmount || 0,
-      pendingCount: pendingInvoices._count || 0,
+      pendingCount: pendingInvoices._count?.id || 0,
       overdueRevenue: overdueInvoices._sum?.totalAmount || 0,
-      overdueCount: overdueInvoices._count || 0,
+      overdueCount: overdueInvoices._count?.id || 0,
+      approvedQuotesRevenue: approvedQuotes._sum?.totalAmount || 0,
+      approvedQuotesCount: approvedQuotes._count?.id || 0,
+      negotiatingQuotesRevenue: negotiatingQuotes._sum?.totalAmount || 0,
+      negotiatingQuotesCount: negotiatingQuotes._count?.id || 0,
       invoiceStats: stats,
       quoteStats,
     });
